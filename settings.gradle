@@ -1,0 +1,3 @@
+rootProject.name = 'markov-chain-project'
+
+include ':markov-chain'

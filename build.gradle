@@ -1,0 +1,18 @@
+group 'com.github.pjozsef'
+version '0.0.1'
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+
+    tasks.withType(Test) {
+        useJUnitPlatform()
+        testLogging.showStandardStreams = true
+
+        testLogging {
+            events "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR"
+            exceptionFormat "full"
+        }
+    }
+}
