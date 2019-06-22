@@ -21,6 +21,7 @@ class TransitionRuleUtilsTest : FreeSpec({
         forall(
             row(
                 1, mapOf(
+                    "" to mapOf("f" to 1, "b" to 2, "q" to 3),
                     "f" to mapOf("o" to 1),
                     "o" to mapOf("o" to 1, "#" to 1),
                     "b" to mapOf("a" to 2),
@@ -34,6 +35,7 @@ class TransitionRuleUtilsTest : FreeSpec({
             ),
             row(
                 2, mapOf(
+                    "" to mapOf("f" to 1, "b" to 2, "q" to 3),
                     "f" to mapOf("o" to 1),
                     "o" to mapOf("o" to 1, "#" to 1),
                     "b" to mapOf("a" to 2),
@@ -56,6 +58,7 @@ class TransitionRuleUtilsTest : FreeSpec({
             ),
             row(
                 3, mapOf(
+                    "" to mapOf("f" to 1, "b" to 2, "q" to 3),
                     "f" to mapOf("o" to 1),
                     "o" to mapOf("o" to 1, "#" to 1),
                     "b" to mapOf("a" to 2),
@@ -85,6 +88,7 @@ class TransitionRuleUtilsTest : FreeSpec({
             ),
             row(
                 4, mapOf(
+                    "" to mapOf("f" to 1, "b" to 2, "q" to 3),
                     "f" to mapOf("o" to 1),
                     "o" to mapOf("o" to 1, "#" to 1),
                     "b" to mapOf("a" to 2),
