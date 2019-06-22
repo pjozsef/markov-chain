@@ -5,6 +5,7 @@ import com.nhaarman.mockitokotlin2.doReturnConsecutively
 import com.nhaarman.mockitokotlin2.mock
 import io.kotlintest.IsolationMode
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
 
 class MarkovChainTest : FreeSpec({
@@ -54,6 +55,12 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("#")
             ) withConstraints Constraints(maxLength = 1) shouldGenerate "A"
         }
+
+        "throws exception once retry count reached" {
+            (mapOf(
+                "" to listOf("#")
+            ) withConstraints Constraints(minLength = 1)).shouldPassRetryCount()
+        }
     }
 
 }) {
@@ -63,18 +70,31 @@ class MarkovChainTest : FreeSpec({
 private data class TestParameters(
     val mockTransitions: Map<String, List<String>>,
     val order: Int = Int.MAX_VALUE,
-    val constraints: Constraints = Constraints()
+    val constraints: Constraints = Constraints(),
+    val retryCount: Int = 2
 )
 
 private infix fun Map<String, List<String>>.withOrder(order: Int): TestParameters = TestParameters(this, order)
-private infix fun Map<String, List<String>>.withConstraints(constraints: Constraints): TestParameters = TestParameters(this, constraints = constraints)
+private infix fun Map<String, List<String>>.withConstraints(constraints: Constraints): TestParameters =
+    TestParameters(this, constraints = constraints)
+
 private infix fun Map<String, List<String>>.shouldGenerate(result: String) = TestParameters(this).shouldGenerate(result)
-private infix fun TestParameters.shouldGenerate(result: String) {
+
+private fun TestParameters.markov(): MarkovChain =
     this.mockTransitions.mapValues { (_, returnValues) ->
         mock<WeightedDice<String>> {
             on { roll() } doReturnConsecutively returnValues
         }
     }.let { dice ->
-        MarkovChain(dice, "#").generate(order = this.order, constraints = this.constraints) shouldBe result
+        MarkovChain(dice, "#", this.retryCount)
+    }
+
+private infix fun TestParameters.shouldGenerate(result: String) {
+    this.markov().generate(order = this.order, constraints = this.constraints) shouldBe result
+}
+
+private fun TestParameters.shouldPassRetryCount() {
+    shouldThrow<MarkovChain.RetryCountReached> {
+        this.markov().generate(order = this.order, constraints = this.constraints)
     }
 }
