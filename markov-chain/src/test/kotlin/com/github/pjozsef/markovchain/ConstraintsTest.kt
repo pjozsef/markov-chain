@@ -5,6 +5,9 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
 
 class ConstraintsTest : FreeSpec({
+    "empty constraint evaluates to true" {
+        Constraints().evaluate("") shouldBe true
+    }
     "minLength"{
         Constraints(minLength = 3) testWith mapOf(
             false to listOf("", "a", "bb"),
@@ -73,7 +76,7 @@ private infix fun Constraints.testWith(inputs: Map<Boolean, List<String>>) {
     val expected = inputs.mapValues { (key, value) ->
         value.map { key }
     }
-    val actual = inputs.mapValues { (key, value) ->
+    val actual = inputs.mapValues { (_, value) ->
         value.map(this.evaluate)
     }
     actual shouldBe expected
