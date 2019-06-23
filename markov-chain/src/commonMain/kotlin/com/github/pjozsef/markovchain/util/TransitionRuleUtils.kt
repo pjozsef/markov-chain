@@ -28,7 +28,7 @@ private fun List<String>.generateRules(transform: List<String>.() -> List<String
 
 private infix fun <K, V> Map<K, List<V>>.merge(pair: Pair<K, V>): Map<K, List<V>> {
     val (key, value) = pair
-    return this + mapOf(key to (this.getOrDefault(key, listOf())) + listOf(value))
+    return this + mapOf(key to ((this[key]?:listOf())) + listOf(value))
 }
 
 fun Map<String, Map<String, Number>>.asDice(): Map<String, WeightedDice<String>> =

@@ -10,7 +10,7 @@ import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
 import io.kotlintest.tables.row
 import java.lang.IllegalArgumentException
-import java.util.*
+import kotlin.random.Random
 
 class RandomUtilsTest: FreeSpec({
     val random = mock<Random>()
