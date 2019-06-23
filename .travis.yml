@@ -8,8 +8,9 @@ jdk:
 
 
 script:
-  - ./gradlew build -x test
-  - ./gradlew test
+  - ./gradlew clean build -x jvmTest -x jsTest
+  - ./gradlew jsTest
+  - ./gradlew jvmTest
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
