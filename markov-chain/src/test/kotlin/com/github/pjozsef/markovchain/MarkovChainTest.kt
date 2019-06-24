@@ -7,7 +7,6 @@ import io.kotlintest.IsolationMode
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
-import java.time.Duration
 
 class MarkovChainTest : FreeSpec({
 
@@ -57,7 +56,7 @@ class MarkovChainTest : FreeSpec({
             ) withConstraints Constraints(maxLength = 1) shouldGenerate "A"
         }
 
-        "throws exception once retry count reached".config(timeout = Duration.ofSeconds(5)) {
+        "throws exception once retry count reached" {
             (mapOf(
                 "" to listOf("#")
             ) withConstraints Constraints(minLength = 1)).shouldPassRetryCount()

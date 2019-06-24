@@ -1,9 +1,8 @@
 package com.github.pjozsef.markovchain.util
 
-import kotlin.math.abs
-import kotlin.random.Random
+import java.util.*
 
-class WeightedCoin(val trueProbability: Double, val random: Random = Random.Default) {
+class WeightedCoin(val trueProbability: Double, val random: Random = Random()) {
 
     init {
         require(trueProbability in 0.0..1.0) { "TrueProbability must be between 0.0 and 1.0, but was: $trueProbability" }
@@ -14,14 +13,14 @@ class WeightedCoin(val trueProbability: Double, val random: Random = Random.Defa
     }
 }
 
-class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random.Default) {
+class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random()) {
     constructor(
         values: List<T>,
         probabilities: List<Number>,
-        random: Random = Random.Default
+        random: Random = Random()
     ) : this(values.zip(probabilities), random)
 
-    constructor(probabilities: List<Pair<T, Number>>, random: Random = Random.Default) : this(probabilities.toMap(), random)
+    constructor(probabilities: List<Pair<T, Number>>, random: Random = Random()) : this(probabilities.toMap(), random)
 
     private val n = probabilities.size
     private val alias = IntArray(n)
@@ -31,7 +30,7 @@ class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random
     init {
         val probList = probabilities.toList().normalize()
         probList.map { it.second }.let {
-            require(abs(1.0 - it.sum()) <= 0.0001) { "Probabilities must add up to 1.0" }
+            require(Math.abs(1.0 - it.sum()) <= 0.0001) { "Probabilities must add up to 1.0" }
             require(it.none { it < 0.0 }) { "Probabilities must not be negative" }
         }
         values = probList.unzip().first
@@ -76,11 +75,11 @@ class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random
     }
 }
 
-fun flipCoin(trueProbability: Double, random: Random = Random.Default): Boolean {
+fun flipCoin(trueProbability: Double, random: Random = Random()): Boolean {
     return WeightedCoin(trueProbability, random).flip()
 }
 
-fun intWeightedDice(probabilities: List<Number>, random: Random = Random.Default) =
+fun intWeightedDice(probabilities: List<Number>, random: Random = Random()) =
     WeightedDice(probabilities.indices.toList().zip(probabilities).toMap(), random)
 
 private fun <T> List<Pair<T, Number>>.normalize(): List<Pair<T, Double>> {

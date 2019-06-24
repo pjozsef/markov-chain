@@ -3,6 +3,7 @@ package com.github.pjozsef.markovchain
 import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.asDice
+import java.lang.RuntimeException
 
 class MarkovChain(
     val transitions: Map<String, WeightedDice<String>>,
