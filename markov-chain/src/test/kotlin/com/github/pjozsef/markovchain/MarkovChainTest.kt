@@ -70,7 +70,29 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("B"),
                 "BB" to listOf("C"),
                 "BBC" to listOf("#")
-            ) withOrder 3 withConstraints Constraints (endsWith = "ASD") shouldGenerate "CBBASD"
+            ) withOrder 3 withConstraints Constraints(endsWith = "ASD") shouldGenerate "CBBASD"
+        }
+
+        "uses both way transitions and combines results" {
+            mapOf(
+                "fol" to listOf("d"),
+                "d" to listOf("e"),
+                "e" to listOf("r"),
+                "r" to listOf("#")
+            ) withBackwardRule mapOf(
+                "de" to listOf("r"),
+                "r" to listOf("o"),
+                "o" to listOf("l", "c"),
+                "l" to listOf("o"),
+                "c" to listOf("#")
+            ) withOrder 3 withConstraints Constraints(
+                startsWith = "fol",
+                endsWith = "ed"
+            ) shouldGenerate listOf(
+                "folored",
+                "folded",
+                "foldered"
+            )
         }
     }
 
@@ -104,7 +126,10 @@ private infix fun Map<String, List<String>>.withBackwardRule(that: Map<String, L
 private infix fun Map<String, List<String>>.shouldGenerate(result: String) =
     TestParameters(this).shouldGenerate(result)
 
-private infix fun TestParameters.shouldGenerate(result: String) {
+private infix fun TestParameters.shouldGenerate(result: String) =
+    this shouldGenerate listOf(result)
+
+private infix fun TestParameters.shouldGenerate(result: List<String>) {
     this.markov().generate(order = this.order, constraints = this.constraints) shouldBe result
 }
 
