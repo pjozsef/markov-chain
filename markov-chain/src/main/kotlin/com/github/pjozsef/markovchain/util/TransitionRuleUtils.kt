@@ -1,15 +1,22 @@
 package com.github.pjozsef.markovchain.util
 
+import com.github.pjozsef.markovchain.Transition
+
+internal typealias RawTransition = Pair<Map<String, Map<String, Number>>, Map<String, Map<String, Number>>>
+
 object TransitionRule {
-    fun fromWords(words: List<String>, order: Int = 1, delimiter: String = "#"): Map<String, Map<String, Number>> =
-        words.map { it + delimiter }.let { wordsWithEnding ->
-            (0..order).map {
-                wordsWithEnding.generateRules(it)
-            }.reduce { acc, curr ->
-                acc + curr
-            }
-        }
+    fun fromWords(words: List<String>, order: Int = 1, delimiter: String = "#"): RawTransition =
+        words.fromWords(order, delimiter) to words.map { it.reversed() }.fromWords(order, delimiter)
 }
+
+private fun List<String>.fromWords(order: Int = 1, delimiter: String = "#"): Map<String, Map<String, Number>> =
+    this.map { it + delimiter }.let { wordsWithEnding ->
+        (0..order).map {
+            wordsWithEnding.generateRules(it)
+        }.reduce { acc, curr ->
+            acc + curr
+        }
+    }
 
 private fun List<String>.generateRules(order: Int): Map<String, Map<String, Number>> = when (order) {
     0 -> this.generateRules { map { it.take(1) } }
@@ -31,5 +38,7 @@ private infix fun <K, V> Map<K, List<V>>.merge(pair: Pair<K, V>): Map<K, List<V>
     return this + mapOf(key to (this.getOrDefault(key, listOf())) + listOf(value))
 }
 
-fun Map<String, Map<String, Number>>.asDice(): Map<String, WeightedDice<String>> =
-    this.mapValues { (_, value) -> WeightedDice(value) }
+fun RawTransition.asDice() = Transition(
+    this.first.mapValues { (_, value) -> WeightedDice(value) },
+    this.second.mapValues { (_, value) -> WeightedDice(value) }
+)

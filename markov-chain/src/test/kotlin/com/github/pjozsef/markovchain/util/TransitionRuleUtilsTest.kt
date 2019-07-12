@@ -31,6 +31,18 @@ class TransitionRuleUtilsTest : FreeSpec({
                     "q" to mapOf("u" to 3),
                     "u" to mapOf("x" to 2, "u" to 2, "z" to 1),
                     "x" to mapOf("#" to 2)
+                ),
+                mapOf(
+                    "" to mapOf("o" to 1, "r" to 1, "z" to 2, "x" to 2),
+                    "o" to mapOf("o" to 1, "f" to 1),
+                    "f" to mapOf("#" to 1),
+                    "r" to mapOf("a" to 1),
+                    "a" to mapOf("b" to 2),
+                    "b" to mapOf("#" to 2),
+                    "z" to mapOf("a" to 1, "u" to 1),
+                    "x" to mapOf("u" to 2),
+                    "u" to mapOf("q" to 3, "u" to 2),
+                    "q" to mapOf("#" to 3)
                 )
             ),
             row(
@@ -54,6 +66,27 @@ class TransitionRuleUtilsTest : FreeSpec({
                     "ux" to mapOf("#" to 2),
                     "uu" to mapOf("x" to 1, "z" to 1),
                     "uz" to mapOf("#" to 1)
+                ),
+                mapOf(
+                    "" to mapOf("o" to 1, "r" to 1, "z" to 2, "x" to 2),
+                    "o" to mapOf("o" to 1, "f" to 1),
+                    "f" to mapOf("#" to 1),
+                    "r" to mapOf("a" to 1),
+                    "a" to mapOf("b" to 2),
+                    "b" to mapOf("#" to 2),
+                    "z" to mapOf("a" to 1, "u" to 1),
+                    "x" to mapOf("u" to 2),
+                    "u" to mapOf("q" to 3, "u" to 2),
+                    "q" to mapOf("#" to 3),
+                    "oo" to mapOf("f" to 1),
+                    "of" to mapOf("#" to 1),
+                    "ra" to mapOf("b" to 1),
+                    "ab" to mapOf("#" to 2),
+                    "za" to mapOf("b" to 1),
+                    "xu" to mapOf("q" to 1, "u" to 1),
+                    "uq" to mapOf("#" to 3),
+                    "uu" to mapOf("q" to 2),
+                    "zu" to mapOf("u" to 1)
                 )
             ),
             row(
@@ -84,6 +117,34 @@ class TransitionRuleUtilsTest : FreeSpec({
                     "quu" to mapOf("x" to 1, "z" to 1),
                     "uux" to mapOf("#" to 1),
                     "uuz" to mapOf("#" to 1)
+                ),
+                mapOf(
+                    "" to mapOf("o" to 1, "r" to 1, "z" to 2, "x" to 2),
+                    "o" to mapOf("o" to 1, "f" to 1),
+                    "f" to mapOf("#" to 1),
+                    "r" to mapOf("a" to 1),
+                    "a" to mapOf("b" to 2),
+                    "b" to mapOf("#" to 2),
+                    "z" to mapOf("a" to 1, "u" to 1),
+                    "x" to mapOf("u" to 2),
+                    "u" to mapOf("q" to 3, "u" to 2),
+                    "q" to mapOf("#" to 3),
+                    "oo" to mapOf("f" to 1),
+                    "of" to mapOf("#" to 1),
+                    "ra" to mapOf("b" to 1),
+                    "ab" to mapOf("#" to 2),
+                    "za" to mapOf("b" to 1),
+                    "xu" to mapOf("q" to 1, "u" to 1),
+                    "uq" to mapOf("#" to 3),
+                    "uu" to mapOf("q" to 2),
+                    "zu" to mapOf("u" to 1),
+                    "oof" to mapOf("#" to 1),
+                    "rab" to mapOf("#" to 1),
+                    "zab" to mapOf("#" to 1),
+                    "xuq" to mapOf("#" to 1),
+                    "xuu" to mapOf("q" to 1),
+                    "uuq" to mapOf("#" to 2),
+                    "zuu" to mapOf("q" to 1)
                 )
             ),
             row(
@@ -116,11 +177,43 @@ class TransitionRuleUtilsTest : FreeSpec({
                     "uuz" to mapOf("#" to 1),
                     "quux" to mapOf("#" to 1),
                     "quuz" to mapOf("#" to 1)
+                ),
+                mapOf(
+                    "" to mapOf("o" to 1, "r" to 1, "z" to 2, "x" to 2),
+                    "o" to mapOf("o" to 1, "f" to 1),
+                    "f" to mapOf("#" to 1),
+                    "r" to mapOf("a" to 1),
+                    "a" to mapOf("b" to 2),
+                    "b" to mapOf("#" to 2),
+                    "z" to mapOf("a" to 1, "u" to 1),
+                    "x" to mapOf("u" to 2),
+                    "u" to mapOf("q" to 3, "u" to 2),
+                    "q" to mapOf("#" to 3),
+                    "oo" to mapOf("f" to 1),
+                    "of" to mapOf("#" to 1),
+                    "ra" to mapOf("b" to 1),
+                    "ab" to mapOf("#" to 2),
+                    "za" to mapOf("b" to 1),
+                    "xu" to mapOf("q" to 1, "u" to 1),
+                    "uq" to mapOf("#" to 3),
+                    "uu" to mapOf("q" to 2),
+                    "zu" to mapOf("u" to 1),
+                    "oof" to mapOf("#" to 1),
+                    "rab" to mapOf("#" to 1),
+                    "zab" to mapOf("#" to 1),
+                    "xuq" to mapOf("#" to 1),
+                    "xuu" to mapOf("q" to 1),
+                    "uuq" to mapOf("#" to 2),
+                    "zuu" to mapOf("q" to 1),
+                    "xuuq" to mapOf("#" to 1),
+                    "zuuq" to mapOf("#" to 1)
                 )
             )
-        ) { order, expected ->
+        ) { order, expectedForward, expectedBackward ->
             "converts words into rules $order" {
-                TransitionRule.fromWords(words, order) shouldBe expected
+                val (forward, backward) = TransitionRule.fromWords(words, order)
+                forward shouldBe expectedForward
+                backward shouldBe expectedBackward
             }
         }
     }
