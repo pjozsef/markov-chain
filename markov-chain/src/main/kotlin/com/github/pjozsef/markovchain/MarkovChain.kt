@@ -37,7 +37,7 @@ class MarkovChain(
         }
         val isBackwards = constraints.endsWith!=null
         val transitionMap = if(isBackwards) transition.backward else transition.forward
-        val prefix = constraints.endsWith ?: constraints.startsWith ?: ""
+        val prefix = constraints.endsWith?.reversed() ?: constraints.startsWith ?: ""
         val result = generateWord(prefix, transitionMap).let {
             if(isBackwards) it.reversed() else it
         }

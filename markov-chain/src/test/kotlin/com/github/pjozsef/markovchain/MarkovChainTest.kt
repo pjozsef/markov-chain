@@ -70,7 +70,7 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("B"),
                 "BB" to listOf("C"),
                 "BBC" to listOf("#")
-            ) withOrder 3 withConstraints Constraints (endsWith = "A") shouldGenerate "CBBA"
+            ) withOrder 3 withConstraints Constraints (endsWith = "ASD") shouldGenerate "CBBASD"
         }
     }
 
