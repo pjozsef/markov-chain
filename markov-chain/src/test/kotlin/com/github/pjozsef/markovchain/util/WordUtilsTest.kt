@@ -80,6 +80,28 @@ class WordUtilsTest : FreeSpec({
             WordUtils.combineWords(startWords, endWords) shouldBe expected
         }
     }
+
+    "commonPostfixPrefixLength" - {
+        "calculates the shared length of first word's postfix and second word's prefix" {
+            WordUtils.commonPostfixPrefixLength(
+                "accomodate",
+                "datenbank"
+            ) shouldBe 4
+        }
+        "calculates the larges shared substring's length" {
+            WordUtils.commonPostfixPrefixLength(
+                "ccccada",
+                "adaqqqq"
+            ) shouldBe 3
+        }
+
+        "returns 0 if the second word does not start with the first's end" {
+            WordUtils.commonPostfixPrefixLength(
+                "nothing",
+                "common"
+            ) shouldBe 0
+        }
+    }
 }) {
     override fun isolationMode() = IsolationMode.InstancePerLeaf
 }
