@@ -20,7 +20,7 @@ class MarkovChainTest : FreeSpec({
             ) shouldGenerate "ABAABB"
         }
 
-        "supports higher order transitions" {
+        "supports higher order transition" {
             mapOf(
                 "" to listOf("A"),
                 "A" to listOf("A"),
@@ -61,6 +61,17 @@ class MarkovChainTest : FreeSpec({
                 "" to listOf("#")
             ) withConstraints Constraints(minLength = 1)).shouldPassRetryCount()
         }
+
+        "uses backward transition rules if 'endsWith' constraint is set" {
+            mapOf(
+                "" to listOf("#")
+            ) withBackwardRule mapOf(
+                "A" to listOf("B"),
+                "B" to listOf("B"),
+                "BB" to listOf("C"),
+                "BBC" to listOf("#")
+            ) withOrder 3 withConstraints Constraints (endsWith = "A") shouldGenerate "CBBA"
+        }
     }
 
 }) {
@@ -68,33 +79,52 @@ class MarkovChainTest : FreeSpec({
 }
 
 private data class TestParameters(
-    val mockTransitions: Map<String, List<String>>,
+    val mockForwardTransitions: Map<String, List<String>>,
+    val mockBackwardTransitions: Map<String, List<String>> = emptyMap(),
     val order: Int = Int.MAX_VALUE,
     val constraints: Constraints = Constraints(),
     val retryCount: Int = 2
 )
 
-private infix fun Map<String, List<String>>.withOrder(order: Int): TestParameters = TestParameters(this, order)
+private infix fun Map<String, List<String>>.withOrder(order: Int): TestParameters =
+    TestParameters(this, order = order)
+
+private infix fun TestParameters.withOrder(order: Int): TestParameters =
+    this.copy(order = order)
+
 private infix fun Map<String, List<String>>.withConstraints(constraints: Constraints): TestParameters =
     TestParameters(this, constraints = constraints)
 
-private infix fun Map<String, List<String>>.shouldGenerate(result: String) = TestParameters(this).shouldGenerate(result)
+private infix fun TestParameters.withConstraints(constraints: Constraints): TestParameters =
+    this.copy(constraints = constraints)
 
-private fun TestParameters.markov(): MarkovChain =
-    this.mockTransitions.mapValues { (_, returnValues) ->
-        mock<WeightedDice<String>> {
-            on { roll() } doReturnConsecutively returnValues
-        }
-    }.let { dice ->
-        MarkovChain(dice, "#", this.retryCount)
-    }
+private infix fun Map<String, List<String>>.withBackwardRule(that: Map<String, List<String>>): TestParameters =
+    TestParameters(this, that)
+
+private infix fun Map<String, List<String>>.shouldGenerate(result: String) =
+    TestParameters(this).shouldGenerate(result)
 
 private infix fun TestParameters.shouldGenerate(result: String) {
     this.markov().generate(order = this.order, constraints = this.constraints) shouldBe result
 }
 
+private fun TestParameters.markov() = MarkovChain(
+    Transition(
+        this.mockForwardTransitions.generateDice(),
+        this.mockBackwardTransitions.generateDice()
+    ),
+    "#",
+    this.retryCount
+)
+
 private fun TestParameters.shouldPassRetryCount() {
     shouldThrow<MarkovChain.RetryCountReached> {
         this.markov().generate(order = this.order, constraints = this.constraints)
+    }
+}
+
+private fun Map<String, List<String>>.generateDice(): MapTransition = this.mapValues { (_, returnValues) ->
+    mock<WeightedDice<String>> {
+        on { roll() } doReturnConsecutively returnValues
     }
 }

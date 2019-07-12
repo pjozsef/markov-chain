@@ -1,20 +1,21 @@
 package com.github.pjozsef.markovchain
 
-import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.WeightedDice
-import com.github.pjozsef.markovchain.util.asDice
 import java.lang.RuntimeException
 
+internal typealias MapTransition = Map<String, WeightedDice<String>>
+
+data class Transition(
+    val forward: MapTransition,
+    val backward: MapTransition
+)
+
 class MarkovChain(
-    val transitions: Map<String, WeightedDice<String>>,
+    val transition: Transition,
     val end: String = "#",
     val allowedRetries: Int = 1_000_000
 ) {
     class RetryCountReached(val count: Int) : RuntimeException("Passed allowed retry count of $count")
-
-    operator fun invoke(current: String): String {
-        return transitions.getValue(current).roll()
-    }
 
     fun generate(
         order: Int = Int.MAX_VALUE,
@@ -23,24 +24,35 @@ class MarkovChain(
 
     private tailrec fun generate(
         order: Int = Int.MAX_VALUE,
-        constraints: Constraints = Constraints(),
+        constraints: Constraints,
         tries: Int
     ): String {
-        tailrec fun generateWord(current: String): String = when (val next = next(current.takeLast(order))) {
-            end -> current
-            else -> generateWord(current + next)
-        }
-        return when {
-            tries >= allowedRetries -> throw RetryCountReached(allowedRetries)
-            else -> {
-                val result = generateWord(constraints.startsWith ?: "")
-                if (constraints.evaluate(result)) result else generate(order, constraints, tries + 1)
+        tailrec fun generateWord(current: String, transitionMap: MapTransition): String =
+            when (val next = next(current.takeLast(order), transitionMap)) {
+                end -> current
+                else -> generateWord(current + next, transitionMap)
             }
+        if(tries >= allowedRetries){
+            throw RetryCountReached(allowedRetries)
+        }
+        val isBackwards = constraints.endsWith!=null
+        val transitionMap = if(isBackwards) transition.backward else transition.forward
+        val prefix = constraints.endsWith ?: constraints.startsWith ?: ""
+        val result = generateWord(prefix, transitionMap).let {
+            if(isBackwards) it.reversed() else it
+        }
+        return if(constraints.evaluate(result)){
+            result
+        } else {
+            generate(order, constraints, tries + 1)
         }
     }
 
-    private tailrec fun next(current: String): String = when (val dice = transitions[current]) {
-        null -> next(current.drop(1))
+    private tailrec fun next(
+        current: String,
+        transitionMap: MapTransition
+    ): String = when (val dice = transitionMap[current]) {
+        null -> next(current.drop(1), transitionMap)
         else -> dice.roll()
     }
 }
