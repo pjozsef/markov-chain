@@ -5,9 +5,9 @@ data class Constraints(
     val maxLength: Int? = null,
     val startsWith: String? = null,
     val endsWith: String? = null,
-    val contains: List<String>? = null,
-    val notContains: List<String>? = null,
-    val excluding: List<String>? = null
+    val contains: Collection<String>? = null,
+    val notContains: Collection<String>? = null,
+    val excluding: Collection<String>? = null
 ) {
     val evaluate: (String) -> Boolean =
         listOfNotNull(
