@@ -1,11 +1,13 @@
 package com.github.pjozsef.markovchain
 
+import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.WeightedDice
+import com.github.pjozsef.markovchain.util.asDice
 import com.nhaarman.mockitokotlin2.doReturnConsecutively
 import com.nhaarman.mockitokotlin2.mock
 import io.kotlintest.IsolationMode
+import io.kotlintest.matchers.numerics.shouldBeGreaterThanOrEqual
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
 
 class MarkovChainTest : FreeSpec({
@@ -56,10 +58,11 @@ class MarkovChainTest : FreeSpec({
             ) withConstraints Constraints(maxLength = 1) shouldGenerate "A"
         }
 
-        "throws exception once retry count reached" {
-            (mapOf(
-                "" to listOf("#")
-            ) withConstraints Constraints(minLength = 1)).shouldPassRetryCount()
+        "returns intermediate result once retry count reached" {
+            mapOf(
+                "" to listOf("A", "#"),
+                "A" to listOf("#")
+            ).markov().generate(1, 3, constraints = Constraints(minLength = 1)) shouldBe setOf("A")
         }
 
         "uses backward transition rules if 'endsWith' constraint is set" {
@@ -94,6 +97,32 @@ class MarkovChainTest : FreeSpec({
                 "foldered"
             )
         }
+
+        "with real transition rules" - {
+            val words = listOf(
+                "foo",
+                "bar",
+                "baz",
+                "qux",
+                "quux",
+                "quuz"
+            )
+            val count = 10
+
+            val markovChain = MarkovChain(TransitionRule.fromWords(words).asDice())
+
+            "returned result size is as specified" {
+                markovChain
+                    .generate(1, count)
+                    .size shouldBe count
+            }
+
+            "returns at least as much words as specified when using hybrid strategy" {
+                markovChain
+                    .generate(1, count, constraints = Constraints(startsWith = "q", endsWith = "x"))
+                    .size shouldBeGreaterThanOrEqual  count
+            }
+        }
     }
 
 }) {
@@ -127,11 +156,13 @@ private infix fun Map<String, List<String>>.shouldGenerate(result: String) =
     TestParameters(this).shouldGenerate(result)
 
 private infix fun TestParameters.shouldGenerate(result: String) =
-    this shouldGenerate listOf(result)
+    this shouldGenerate setOf(result)
 
-private infix fun TestParameters.shouldGenerate(result: List<String>) {
-    this.markov().generate(order = this.order, constraints = this.constraints) shouldBe result
+private infix fun TestParameters.shouldGenerate(result: Collection<String>) {
+    this.markov().generate(order = this.order, count = 1, constraints = this.constraints) shouldBe result.toSet()
 }
+
+private fun Map<String, List<String>>.markov() = TestParameters(this).markov()
 
 private fun TestParameters.markov() = MarkovChain(
     Transition(
@@ -141,12 +172,6 @@ private fun TestParameters.markov() = MarkovChain(
     "#",
     this.retryCount
 )
-
-private fun TestParameters.shouldPassRetryCount() {
-    shouldThrow<MarkovChain.RetryCountReached> {
-        this.markov().generate(order = this.order, constraints = this.constraints)
-    }
-}
 
 private fun Map<String, List<String>>.generateDice(): MapTransition = this.mapValues { (_, returnValues) ->
     mock<WeightedDice<String>> {

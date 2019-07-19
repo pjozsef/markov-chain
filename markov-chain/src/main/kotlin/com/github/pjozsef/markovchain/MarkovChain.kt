@@ -16,17 +16,19 @@ class MarkovChain(
     val end: String = "#",
     val allowedRetries: Int = 1_000_000
 ) {
-    class RetryCountReached(val count: Int) : RuntimeException("Passed allowed retry count of $count")
 
     fun generate(
         order: Int = Int.MAX_VALUE,
+        count: Int,
         constraints: Constraints = Constraints()
-    ) = generate(order, constraints, 0, emptyList(), emptyList())
+    ) = generate(order, constraints, 0, count, emptySet(), emptyList(), emptyList())
 
     private tailrec fun generate(
         order: Int = Int.MAX_VALUE,
         constraints: Constraints,
         tries: Int,
+        count: Int,
+        results: Set<String>,
         bufferedStarts: List<String>,
         bufferedEnds: List<String>
     ): Collection<String> {
@@ -35,37 +37,33 @@ class MarkovChain(
                 end -> current
                 else -> generateWord(current + next, transitionMap)
             }
-        if(tries >= allowedRetries){
-            throw RetryCountReached(allowedRetries)
-        }
-        val isForwards = constraints.startsWith!=null
-        val isBackwards = constraints.endsWith!=null
 
-        return when{
-            isForwards&&isBackwards -> {
-                val startWord = generateWord(constraints.startsWith ?: "", transition.forward)
-                val newStarts = bufferedStarts + listOf(startWord)
-                val endWord = generateWord(constraints.endsWith?.reversed() ?: "", transition.backward).reversed()
-                val newEnds = bufferedEnds + listOf(endWord)
-                val results = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
-                if(results.isNotEmpty()){
-                    println(tries)
-                    results
-                } else {
-                    generate(order, constraints, tries + 1, newStarts, newEnds)
-                }
+        val isForwards = constraints.startsWith != null
+        val isBackwards = constraints.endsWith != null
+
+        return when {
+            results.size >= count || tries >= allowedRetries -> results
+            isForwards && isBackwards -> {
+                val newStarts = bufferedStarts +
+                        generateWord(
+                            constraints.startsWith ?: "",
+                            transition.forward
+                        ).let(::listOf)
+                val newEnds = bufferedEnds +
+                        generateWord(
+                            constraints.endsWith?.reversed() ?: "",
+                            transition.backward
+                        ).reversed().let(::listOf)
+                val newResults = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
+                generate(order, constraints, tries + 1, count, results + newResults, newStarts, newEnds)
             }
             else -> {
-                val transitionMap = if(isBackwards) transition.backward else transition.forward
+                val transitionMap = if (isBackwards) transition.backward else transition.forward
                 val prefix = constraints.endsWith?.reversed() ?: constraints.startsWith ?: ""
-                val result = generateWord(prefix, transitionMap).let {
-                    if(isBackwards) it.reversed() else it
-                }
-                if(constraints.evaluate(result)){
-                    listOf(result)
-                } else {
-                    generate(order, constraints, tries + 1, bufferedStarts, bufferedEnds)
-                }
+                val newResult = generateWord(prefix, transitionMap).let {
+                    if (isBackwards) it.reversed() else it
+                }.let(::listOf).filter(constraints.evaluate::invoke)
+                generate(order, constraints, tries + 1, count, results + newResult, bufferedStarts, bufferedEnds)
             }
         }
     }
