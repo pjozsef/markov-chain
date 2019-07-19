@@ -21,7 +21,7 @@ class MarkovChain(
         order: Int = Int.MAX_VALUE,
         count: Int,
         constraints: Constraints = Constraints()
-    ) = generate(order, constraints, 0, count, emptySet(), emptyList(), emptyList())
+    ) = generate(order, constraints, 0, count, emptySet(), emptySet(), emptySet())
 
     private tailrec fun generate(
         order: Int = Int.MAX_VALUE,
@@ -29,8 +29,8 @@ class MarkovChain(
         tries: Int,
         count: Int,
         results: Set<String>,
-        bufferedStarts: List<String>,
-        bufferedEnds: List<String>
+        bufferedStarts: Set<String>,
+        bufferedEnds: Set<String>
     ): Collection<String> {
         tailrec fun generateWord(current: String, transitionMap: MapTransition): String =
             when (val next = next(current.takeLast(order), transitionMap)) {
@@ -48,12 +48,12 @@ class MarkovChain(
                         generateWord(
                             constraints.startsWith ?: "",
                             transition.forward
-                        ).let(::listOf)
+                        ).let(::setOf)
                 val newEnds = bufferedEnds +
                         generateWord(
                             constraints.endsWith?.reversed() ?: "",
                             transition.backward
-                        ).reversed().let(::listOf)
+                        ).reversed().let(::setOf)
                 val newResults = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
                 generate(order, constraints, tries + 1, count, results + newResults, newStarts, newEnds)
             }

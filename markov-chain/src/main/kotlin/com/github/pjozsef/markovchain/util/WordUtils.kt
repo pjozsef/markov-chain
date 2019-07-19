@@ -1,21 +1,21 @@
 package com.github.pjozsef.markovchain.util
 
 object WordUtils {
-    fun combineWords(starts: List<String>, ends: List<String>): List<String> =
+    fun combineWords(starts: Collection<String>, ends: Collection<String>): Set<String> =
         starts.flatMap { start ->
             ends.flatMap { end ->
                 combineWords(start, end)
             }
-        }.distinct()
+        }.toSet()
 
-    fun combineWords(start: String, end: String): List<String> =
+    fun combineWords(start: String, end: String): Set<String> =
         start.mapIndexed { i, charA ->
             end.mapIndexedNotNull { j, charB ->
                 if (charA == charB) i to j else null
             }
         }.flatten().map { (firstEnd, secondStart) ->
             start.substring(0, firstEnd) + end.substring(secondStart)
-        }.distinct()
+        }.toSet()
 
     fun commonPostfixPrefixLength(prefix: String, postfix: String): Int =
         (1..prefix.length).map {

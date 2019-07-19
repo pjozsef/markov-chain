@@ -14,7 +14,7 @@ class WordUtilsTest : FreeSpec({
                 "returns all combinations of words at matching letters",
                 "red",
                 "dimension",
-                listOf(
+                setOf(
                     "rension",
                     "redimension"
                 )
@@ -23,7 +23,7 @@ class WordUtilsTest : FreeSpec({
                 "returns words without duplication",
                 "folder",
                 "colored",
-                listOf(
+                setOf(
                     "folored",
                     "fored",
                     "fold",
@@ -35,7 +35,7 @@ class WordUtilsTest : FreeSpec({
                 "returns words without duplication #2",
                 "endure",
                 "red",
-                listOf(
+                setOf(
                     "ed",
                     "end",
                     "endured"
@@ -60,7 +60,7 @@ class WordUtilsTest : FreeSpec({
                 "dimension",
                 "cinema"
             )
-            val expected = listOf(
+            val expected = setOf(
                 "fon",
                 "follon",
                 "foldure",
