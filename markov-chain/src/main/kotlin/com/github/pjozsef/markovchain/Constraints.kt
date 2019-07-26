@@ -9,7 +9,8 @@ data class Constraints(
     val endsWith: String? = null,
     val contains: Collection<String>? = null,
     val notContains: Collection<String>? = null,
-    val excluding: Collection<String>? = null
+    val excluding: Collection<String>? = null,
+    val hybridPrefixPostfix: Boolean? = null
 ) {
     init {
         if (minLength != null) {

@@ -89,12 +89,38 @@ class MarkovChainTest : FreeSpec({
                 "l" to listOf("o"),
                 "c" to listOf("#")
             ) withOrder 3 withConstraints Constraints(
+                hybridPrefixPostfix = true,
                 startsWith = "fol",
                 endsWith = "ed"
             ) shouldGenerate listOf(
                 "folored",
                 "folded",
                 "foldered"
+            )
+        }
+
+        "uses both way transitions without combining them" {
+            val params = mapOf(
+                "fol" to listOf("d"),
+                "d" to listOf("e", "#"),
+                "e" to listOf("d")
+            ) withBackwardRule mapOf(
+                "de" to listOf("w"),
+                "w" to listOf("o"),
+                "l" to listOf("l", "o"),
+                "o" to listOf("l", "f"),
+                "f" to listOf("#")
+            ) withOrder 3 withConstraints Constraints(
+                startsWith = "fol",
+                endsWith = "ed"
+            )
+            params.markov().generate(
+                order = 3,
+                count = 6,
+                constraints = params.constraints
+            ) shouldBe setOf(
+                "folded",
+                "followed"
             )
         }
 
@@ -120,7 +146,7 @@ class MarkovChainTest : FreeSpec({
             "returns at least as much words as specified when using hybrid strategy" {
                 markovChain
                     .generate(1, count, constraints = Constraints(startsWith = "q", endsWith = "x"))
-                    .size shouldBeGreaterThanOrEqual  count
+                    .size shouldBeGreaterThanOrEqual count
             }
         }
     }

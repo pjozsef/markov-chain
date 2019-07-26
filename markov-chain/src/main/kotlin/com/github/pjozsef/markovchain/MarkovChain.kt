@@ -2,7 +2,7 @@ package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.WordUtils
-import java.lang.RuntimeException
+import com.github.pjozsef.markovchain.util.isTrue
 
 internal typealias MapTransition = Map<String, WeightedDice<String>>
 
@@ -43,19 +43,29 @@ class MarkovChain(
 
         return when {
             results.size >= count || tries >= allowedRetries -> results
-            isForwards && isBackwards -> {
-                val newStarts = bufferedStarts +
-                        generateWord(
-                            constraints.startsWith ?: "",
-                            transition.forward
-                        ).let(::setOf)
-                val newEnds = bufferedEnds +
-                        generateWord(
-                            constraints.endsWith?.reversed() ?: "",
-                            transition.backward
-                        ).reversed().let(::setOf)
+            isForwards && isBackwards && constraints.hybridPrefixPostfix.isTrue -> {
+                val newStarts = bufferedStarts + generateWord(
+                    constraints.startsWith ?: "",
+                    transition.forward
+                ).let(::setOf)
+                val newEnds = bufferedEnds + generateWord(
+                    constraints.endsWith?.reversed() ?: "",
+                    transition.backward
+                ).reversed().let(::setOf)
                 val newResults = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
                 generate(order, constraints, tries + 1, count, results + newResults, newStarts, newEnds)
+            }
+            isForwards && isBackwards -> {
+                val forward = generateWord(
+                    constraints.startsWith ?: "",
+                    transition.forward
+                )
+                val backward = generateWord(
+                    constraints.endsWith?.reversed() ?: "",
+                    transition.backward
+                ).reversed()
+                val newResult = listOf(forward, backward).filter(constraints.evaluate::invoke)
+                generate(order, constraints, tries + 2, count, results + newResult, bufferedStarts, bufferedEnds)
             }
             else -> {
                 val transitionMap = if (isBackwards) transition.backward else transition.forward
