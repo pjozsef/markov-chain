@@ -1,3 +1,4 @@
 rootProject.name = 'markov-chain-project'
 
 include ':markov-chain'
+include ':markov-chain-cli'

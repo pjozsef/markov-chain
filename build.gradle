@@ -1,7 +1,19 @@
 group 'com.github.pjozsef'
 version '0.0.1'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50"
+        classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
+    }
+}
+
 allprojects {
+    apply plugin: 'kotlin'
+
     repositories {
         jcenter()
     }
@@ -14,5 +26,12 @@ allprojects {
             events "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR"
             exceptionFormat "full"
         }
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
     }
 }
