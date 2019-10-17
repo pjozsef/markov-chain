@@ -1,6 +1,7 @@
 package com.github.pjozsef.markovchain.util
 
 import com.github.pjozsef.markovchain.Transition
+import java.util.*
 
 internal typealias RawTransition = Pair<Map<String, Map<String, Number>>, Map<String, Map<String, Number>>>
 
@@ -38,7 +39,7 @@ private infix fun <K, V> Map<K, List<V>>.merge(pair: Pair<K, V>): Map<K, List<V>
     return this + mapOf(key to (this.getOrDefault(key, listOf())) + listOf(value))
 }
 
-fun RawTransition.asDice() = Transition(
-    this.first.mapValues { (_, value) -> WeightedDice(value) },
-    this.second.mapValues { (_, value) -> WeightedDice(value) }
+fun RawTransition.asDice(random: Random = Random()) = Transition(
+    this.first.mapValues { (_, value) -> WeightedDice(value, random) },
+    this.second.mapValues { (_, value) -> WeightedDice(value, random) }
 )
