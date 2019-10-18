@@ -2,13 +2,11 @@ language: java
 
 jdk:
   - oraclejdk11
-  - openjdk8
   - openjdk11
 
-
 script:
-  - ./gradlew build -x test
-  - ./gradlew test
+  - "./gradlew build -x test"
+  - "./gradlew test"
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -16,5 +14,10 @@ before_cache:
 
 cache:
   directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+
+deploy:
+  app: markov-chain-service
+  api_key:
+    secure: nrDokkajTNYAJf+quNrizUsXRATKZwLSY0y4BUKtLhi5rL10XJJXK00sq4H4IUplxl8g4iQTn+h366lkqJ8Pzxl6HctOGh3vqCvpcAdKyaoEzY15jxsA8VlRJsWDcHijF4WCDXBcJkFdLvj68hEskynq24NXSnp0fXW3CqRquswJozRFGandFj5o6Bn52vMDEYmU/bpfTicNI7MrGSpRPQpcq3/VCo3orGaFhtHEdJ8wicA4urFS0ePtOpiBUSwBguNWvcu0bZ/sw71Nw8WLPUZY4FytZ+uSOH+iHc/E4GS4PBaD8G7nml6qcraDEUKLyAEnMRLak+EzlEmiLQgK/iOntCOJc3AGFONz16aiPrlzrxazlkTLYk9N8ckhQr2csYdsDDzwBgQs/jVK5URl+2eGhY4V4pOLaRtw8VTLyucy5/BQPeneSXqX2H5OzrDf/4Dt9m5aQ88sXCyMJPm9rCCnDDd9Eyouzz30bZ4rOKJSJAWwFEPS0vMziV1mY43SyPwrtwY3qbiqm+mv/xYXkx79UJ2ClO4VCGHNmCToADYzyA75bKmNMy4ofIvBhOZGByghKsFk5ft9QwmmWL3GRLhnUs1YMzIK0GpqFm1L7pgGTxJc7JfY5K0W6E2cqERkjHwoU3QfPKqvcy+18J/9M8bpxn8E4tpcHu1VzfhTgSw=
