@@ -111,6 +111,7 @@ class MarkovChainTest : FreeSpec({
                 "o" to listOf("l", "f"),
                 "f" to listOf("#")
             ) withOrder 3 withConstraints Constraints(
+                hybridPrefixPostfix = false,
                 startsWith = "fol",
                 endsWith = "ed"
             )
