@@ -2,7 +2,6 @@ package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.WordUtils
-import com.github.pjozsef.markovchain.util.isTrue
 
 internal typealias MapTransition = Map<String, WeightedDice<String>>
 
@@ -43,7 +42,7 @@ class MarkovChain(
 
         return when {
             results.size >= count || tries >= allowedRetries -> results
-            isForwards && isBackwards && constraints.hybridPrefixPostfix.isTrue -> {
+            isForwards && isBackwards && constraints.hybridPrefixPostfix -> {
                 val newStarts = bufferedStarts + generateWord(
                     constraints.startsWith ?: "",
                     transition.forward

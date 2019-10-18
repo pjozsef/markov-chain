@@ -8,11 +8,8 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.pjozsef.markovchain.Constraints
-import com.github.pjozsef.markovchain.MarkovChain
-import com.github.pjozsef.markovchain.util.TransitionRule
-import com.github.pjozsef.markovchain.util.asDice
+import com.github.pjozsef.markovchain.generateWords
 import java.io.File
-import java.util.*
 
 class MainCommand : CliktCommand() {
 
@@ -39,31 +36,14 @@ class MainCommand : CliktCommand() {
     override fun run() {
         println(words)
 
-        val random = initializeRandom()
-
-        val constraints = getConstraints()
-
-        val chain = MarkovChain(
-            TransitionRule.fromWords(
-                words.readLines(),
-                order = order
-            ).asDice(random),
-            allowedRetries = allowedRetries
-        )
-        chain.generate(
-            order = order,
-            count = count,
-            constraints = constraints
-        ).shuffled(random)
-            .take(count)
-            .toSortedSet()
-            .forEach(::println)
-    }
-
-    private fun initializeRandom(): Random {
-        val randomSeed = seed?.toLong(RADIX_36) ?: Random().nextLong()
-        println("Seed: ${randomSeed.toString(RADIX_36)}")
-        return Random(randomSeed)
+        generateWords(
+            words.readLines(),
+            order,
+            allowedRetries,
+            count,
+            seed?.toLong(RADIX_36),
+            getConstraints()
+        ).forEach(::println)
     }
 
     private fun getConstraints() = Constraints(

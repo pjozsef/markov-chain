@@ -1,0 +1,7 @@
+spring:
+  application.name: markov-chain-service
+logging:
+  level:
+    root: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS Z} [%t] %-5p %c - %m%n"
