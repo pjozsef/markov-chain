@@ -39,9 +39,15 @@ function send(payload) {
         if (this.status == 200) {
             console.log(xhttp.response)
             console.log(typeof xhttp.response)
-           document.getElementById("result").innerHTML = JSON.parse(xhttp.response).map(function(item){
-            return '<li>'+item+'</li>';
-           }).join('')
+            var response = JSON.parse(xhttp.response)
+            var resultContainer = document.getElementById("result")
+            if(response.length == 0){
+                resultContainer.innerHTML = '<li>No results</li>'
+            } else {
+               resultContainer.innerHTML = response.map(function(item){
+                return '<li>'+item+'</li>';
+               }).join('')
+            }
         } else {
             console.log(xhttp.responseText)
         }
