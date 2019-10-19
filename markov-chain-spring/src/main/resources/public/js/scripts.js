@@ -2,18 +2,15 @@ function generate() {
     var payload = {
         constraints: {}
     }
-    extract('words', payload, function(value) {
-        return value.split('\n')
-    })
+    extract('words', payload, splitBy('\n'))
     extract('order', payload)
     extract('seed', payload)
-
     extract('minLength', payload.constraints)
     extract('maxLength', payload.constraints)
     extract('startsWith', payload.constraints)
     extract('endsWith', payload.constraints)
-    extract('contains', payload.constraints, wrapInArray)
-    extract('notContains', payload.constraints, wrapInArray)
+    extract('contains', payload.constraints, splitBy(','))
+    extract('notContains', payload.constraints, splitBy(','))
 
     send(payload)
 }
@@ -29,8 +26,12 @@ function extract(key, object, f) {
     }
 }
 
-function wrapInArray(value) {
-    return [value]
+function splitBy(separator) {
+    return function(value) {
+        return value.split(separator).map(function(item){
+            return item.trim()
+        }).filter(Boolean)
+    }
 }
 
 function send(payload) {
@@ -56,3 +57,7 @@ function send(payload) {
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send(JSON.stringify(payload));
 }
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})

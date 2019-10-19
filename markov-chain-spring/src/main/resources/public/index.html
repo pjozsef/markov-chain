@@ -12,63 +12,62 @@
 <body>
 <div class="container">
         <div class="row">
-            <div class="col-12 col-lg-3">
-                <div class="card">
+            <div class="col-12 col-lg-3 pb-4 h-auto">
+                <div class="card mt-4 h-100">
                     <div class="card-body">
-                        <h4 class="card-title">Input words</h4>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
-                            the card's content.</p>
-                        <textarea class="form-control" id="words"></textarea>
+                        <h4 class="card-title text-center">Input words <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="Provide all the input words that the Markov Chain should use to generate new words.">?</span></h4>
+                        <p class="card-text">Put each word on a new line.</p>
+                        <textarea class="form-control" rows="15" id="words"></textarea>
                     </div>
                 </div>
             </div>
             <div class="col">
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-body">
-                        <h4 class="card-title">Configuration</h4>
+                        <h4 class="card-title text-center">Configuration</h4>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of
                             the
                             card's content.</p>
                         <div class="row">
                             <div class="col form-group">
-                                <label for="order">Order</label>
+                                <label for="order">Order <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="Order defines the last X characters that are taken into consideration to choose the next character in the word. An order of 3 means the last 3 characters define the next character.">?</span></label>
                                 <input type="number" value="3" class="form-control" id="order" placeholder="Order"
                                        min="1" max="5">
                             </div>
                             <div class="col form-group">
-                                <label for="seed">Seed</label>
+                                <label for="seed">Seed <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="You can provide a seed if you want to reproduce the same result list at a later time.">?</span></label>
                                 <input type="number" class="form-control" id="seed" placeholder="Seed">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col form-group">
-                                <label for="minLength">Min length</label>
+                                <label for="minLength">Min length <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="You can set the minimum length of the generated words.">?</span></label>
                                 <input type="number" value="4" class="form-control" id="minLength" placeholder="Min length" min="1"
                                        max="30">
                             </div>
                             <div class="col form-group">
-                                <label for="maxLength">Max length</label>
+                                <label for="maxLength">Max length <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="You can set the maximum length of the generated words.">?</span></label>
                                 <input type="number" value="10" class="form-control" id="maxLength" placeholder="Max length" min="1"
                                        max="30">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col form-group">
-                                <label for="startsWith">Starts with</label>
+                                <label for="startsWith">Starts with <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="You can define what characters the generated words should start with.">?</span></label>
                                 <input type="text" class="form-control" id="startsWith" placeholder="Starts with">
                             </div>
                             <div class="col form-group">
-                                <label for="endsWith">Ends with</label>
+                                <label for="endsWith">Ends with <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="You can define what characters the generated words should end with.">?</span></label>
                                 <input type="text" class="form-control" id="endsWith" placeholder="Ends with">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col form-group">
-                                <label for="contains">Contains</label>
+                                <label for="contains">Contains <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="Provide a list of comma separated Strings that the generated words must contain.">?</span></label>
                                 <input type="text" class="form-control" id="contains" placeholder="Contains">
                             </div>
                             <div class="col form-group">
-                                <label for="notContains">Not contains</label>
+                                <label for="notContains">Not contains <span class="badge badge-secondary badge-pill" style="font-size: 0.5em; vertical-align: middle;" data-toggle="tooltip" data-placement="top" title="Provide a list of comma separated Strings that the generated words must not contain.">?</span></label>
                                 <input type="text" class="form-control" id="notContains" placeholder="Not contains">
                             </div>
                         </div>
@@ -77,9 +76,9 @@
                 </div>
             </div>
             <div class="col-12 col-lg-3">
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-body">
-                        <h4 class="card-title">Result</h4>
+                        <h4 class="card-title text-center">Result</h4>
                         <ul style="list-style-type:none" id="result">
                         </ul>
                     </div>
