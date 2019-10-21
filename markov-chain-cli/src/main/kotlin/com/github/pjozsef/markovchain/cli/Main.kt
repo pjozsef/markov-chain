@@ -4,6 +4,7 @@ package com.github.pjozsef.markovchain.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
@@ -17,7 +18,8 @@ class MainCommand : CliktCommand() {
         private const val RADIX_36 = 36
     }
 
-    val words: File by argument().file(exists = true, folderOkay = false, readable = true)
+    val words: List<File> by argument().file(exists = true, folderOkay = false, readable = true).multiple(true)
+    private val actualWords by lazy { words.flatMap { it.readLines() } }
 
     val seed: String? by option("--seed")
     val count: Int by option("--count").int().default(10)
@@ -37,7 +39,7 @@ class MainCommand : CliktCommand() {
         println(words)
 
         generateWords(
-            words.readLines(),
+            actualWords,
             order,
             allowedRetries,
             count,
@@ -53,7 +55,7 @@ class MainCommand : CliktCommand() {
         endsWith,
         contains,
         notContains,
-        excluding,
+        excluding ?: actualWords,
         hybridPrefixPostfix
     )
 
