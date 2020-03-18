@@ -1,6 +1,22 @@
+version = parent.version
+
+apply plugin: 'info.solidsoft.pitest'
+apply from: "$rootDir/release.gradle"
+
+
+pitest {
+    pitestVersion = '1.4.10'
+    testPlugin.set("junit5")
+    targetClasses.set(['com.github.pjozsef.markovchain.*'])
+    avoidCallsTo.set(['org.slf4j', 'kotlin.jvm.internal.Intrinsics'])
+    threads.set(4)
+    outputFormats.set(['XML', 'HTML'])
+}
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    
+
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.3.2"
+    testRuntime 'org.slf4j:slf4j-simple:1.7.30'
 }
