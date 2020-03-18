@@ -1,4 +1,5 @@
 version = parent.version
+group = parent.group
 
 apply plugin: 'info.solidsoft.pitest'
 apply from: "$rootDir/release.gradle"
