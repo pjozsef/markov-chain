@@ -1,11 +1,18 @@
 language: java
 
 jdk:
+  - openjdk8
   - openjdk11
 
-script:
-  - "./gradlew build -x test"
-  - "./gradlew test"
+jobs:
+  include:
+    - stage: compile
+      script: "./gradlew build -x test"
+    - stage: test
+      script: "./gradlew test"
+    - stage: release
+      script: "./gradlew bintrayUpload"
+      if: tag is present
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
