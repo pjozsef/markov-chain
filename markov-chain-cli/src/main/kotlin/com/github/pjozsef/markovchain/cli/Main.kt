@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
-import com.github.pjozsef.markovchain.Constraints
+import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.generateWords
 import java.io.File
 
@@ -29,7 +29,9 @@ class MainCommand : CliktCommand() {
     val minLength: Int by option("--min").int().default(3)
     val maxLength: Int by option("--max").int().default(8)
     val startsWith: String? by option("--starts")
+    val notStartsWith: Collection<String>? by option("--not-starts").split(",")
     val endsWith: String? by option("--ends")
+    val notEndsWith: Collection<String>? by option("--not-ends").split(",")
     val contains: Collection<String>? by option("--contains").split(",")
     val notContains: Collection<String>? by option("--not-contains").split(",")
     val excluding: Collection<String>? by option("--excluding").split(",")
@@ -52,7 +54,9 @@ class MainCommand : CliktCommand() {
         minLength,
         maxLength,
         startsWith,
+        notStartsWith,
         endsWith,
+        notEndsWith,
         contains,
         notContains,
         excluding ?: actualWords,

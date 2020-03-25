@@ -1,5 +1,6 @@
 package com.github.pjozsef.markovchain
 
+import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.WordUtils
 

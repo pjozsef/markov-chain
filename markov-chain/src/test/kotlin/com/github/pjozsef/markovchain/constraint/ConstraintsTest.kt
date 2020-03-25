@@ -1,10 +1,12 @@
-package com.github.pjozsef.markovchain
+package com.github.pjozsef.markovchain.constraint
 
 import io.kotlintest.IsolationMode
+import io.kotlintest.data.forall
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotThrow
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
+import io.kotlintest.tables.row
 import java.lang.IllegalArgumentException
 
 class ConstraintsTest : FreeSpec({
@@ -43,25 +45,89 @@ class ConstraintsTest : FreeSpec({
 
         "maxLenth less than startsWith length" {
             shouldThrow<IllegalArgumentException> {
-                Constraints(startsWith = "toolong", maxLength = 3)
+                Constraints(
+                    startsWith = "toolong",
+                    maxLength = 3
+                )
             }
         }
 
         "maxLenth less than endsWith length" {
             shouldThrow<IllegalArgumentException> {
-                Constraints(endsWith = "toolong", maxLength = 3)
+                Constraints(
+                    endsWith = "toolong",
+                    maxLength = 3
+                )
             }
         }
 
         "maxLenth equals minimal possible word with startsWith+endsWith" {
             shouldNotThrow<IllegalArgumentException> {
-                Constraints(startsWith = "asdf", endsWith = "sdfk", maxLength = 5)
+                Constraints(
+                    startsWith = "asdf",
+                    endsWith = "sdfk",
+                    maxLength = 5
+                )
             }
         }
 
         "maxLenth less than minimal possible word with startsWith+endsWith" {
             shouldThrow<IllegalArgumentException> {
-                Constraints(startsWith = "asdf", endsWith = "sdfk", maxLength = 4)
+                Constraints(
+                    startsWith = "asdf",
+                    endsWith = "sdfk",
+                    maxLength = 4
+                )
+            }
+        }
+
+        "startsWith and notStartsWith has common prefixes" {
+            forall(
+                row("asdf"),
+                row("asd"),
+                row("as"),
+                row("a")
+            ) {
+                shouldThrow<IllegalArgumentException> {
+                    Constraints(
+                        startsWith = "asdf",
+                        notStartsWith = listOf(it)
+                    )
+                }
+            }
+        }
+
+        "notStartsWith can be longer than startsWith" {
+            shouldNotThrow<IllegalArgumentException> {
+                Constraints(
+                    startsWith = "asdf",
+                    notStartsWith = listOf("asdfj")
+                )
+            }
+        }
+
+        "endsWith and notEndsWith has common prefixes" {
+            forall(
+                row("asdf"),
+                row("sdf"),
+                row("df"),
+                row("f")
+            ) {
+                shouldThrow<IllegalArgumentException> {
+                    Constraints(
+                        endsWith = "asdf",
+                        notEndsWith = listOf(it)
+                    )
+                }
+            }
+        }
+
+        "notEndsWith can be longer than endsWith" {
+            shouldNotThrow<IllegalArgumentException> {
+                Constraints(
+                    endsWith = "asdf",
+                    notEndsWith = listOf("aasdf")
+                )
             }
         }
     }
@@ -88,10 +154,34 @@ class ConstraintsTest : FreeSpec({
                 true to listOf("asdf", "asdfasdf", "asdfjkl")
             )
         }
+        "notStartsWith" {
+            Constraints(
+                notStartsWith = listOf(
+                    "a",
+                    "bb",
+                    "theend"
+                )
+            ) testWith mapOf(
+                false to listOf("a", "aaaaa", "bb", "bbb", "bbba", "theend_"),
+                true to listOf("ba", "b", "end", "random")
+            )
+        }
         "endsWith" {
             Constraints(endsWith = "asdf") testWith mapOf(
                 false to listOf("", "_", "_____sdf", "asdf-"),
                 true to listOf("asdf", "asdfasdf", "jklasdf")
+            )
+        }
+        "notEndsWith" {
+            Constraints(
+                notEndsWith = listOf(
+                    "a",
+                    "bb",
+                    "theend"
+                )
+            ) testWith mapOf(
+                false to listOf("a", "bb", "bbb", "bbba", "_theend"),
+                true to listOf("ab", "b", "end", "random")
             )
         }
         "contains" {
@@ -101,7 +191,13 @@ class ConstraintsTest : FreeSpec({
             )
         }
         "contains multiple" {
-            Constraints(contains = listOf("a", "b", "c")) testWith mapOf(
+            Constraints(
+                contains = listOf(
+                    "a",
+                    "b",
+                    "c"
+                )
+            ) testWith mapOf(
                 false to listOf("asd", "_", "abbaababababba", "-aaaacc", "bc"),
                 true to listOf("abc", "cba", "_a_b_c_ccc_aa_bb_")
             )
@@ -113,19 +209,36 @@ class ConstraintsTest : FreeSpec({
             )
         }
         "notContains multiple" {
-            Constraints(notContains = listOf("a", "b", "c")) testWith mapOf(
+            Constraints(
+                notContains = listOf(
+                    "a",
+                    "b",
+                    "c"
+                )
+            ) testWith mapOf(
                 false to listOf("a", "b", "c", "abc", "cba", "_a_b_c_ccc_aa_bb_"),
                 true to listOf("sdf", "_", "")
             )
         }
         "excluding" {
-            Constraints(excluding = listOf("a", "b", "c")) testWith mapOf(
+            Constraints(
+                excluding = listOf(
+                    "a",
+                    "b",
+                    "c"
+                )
+            ) testWith mapOf(
                 false to listOf("a", "b", "c"),
                 true to listOf("sdf", "_", "", "abc", "cba", "_a_b_c_ccc_aa_bb_")
             )
         }
         "excluding multiple" {
-            Constraints(excluding = listOf("as", "df")) testWith mapOf(
+            Constraints(
+                excluding = listOf(
+                    "as",
+                    "df"
+                )
+            ) testWith mapOf(
                 false to listOf("as", "df"),
                 true to listOf("as_", "_as", "_as_", "asdf", "_df", "df_", "_df_")
             )

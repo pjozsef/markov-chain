@@ -1,6 +1,6 @@
 package com.github.pjozsef.markovchain.spring.dto
 
-import com.github.pjozsef.markovchain.Constraints
+import com.github.pjozsef.markovchain.constraint.Constraints
 
 data class MarkovChainRequestDto(
     val words: List<String>,
@@ -14,7 +14,9 @@ data class ConstraintsDto(
     val minLength: Int? = null,
     val maxLength: Int? = null,
     val startsWith: String? = null,
+    val notStartsWith: Collection<String>? = null,
     val endsWith: String? = null,
+    val notEndsWith: Collection<String>? = null,
     val contains: Collection<String>? = null,
     val notContains: Collection<String>? = null,
     val excluding: Collection<String>? = null,
@@ -25,7 +27,9 @@ fun MarkovChainRequestDto.toConstraints() = Constraints(
     constraints.minLength,
     constraints.maxLength,
     constraints.startsWith,
+    constraints.notStartsWith,
     constraints.endsWith,
+    constraints.notEndsWith,
     constraints.contains,
     constraints.notContains,
     constraints.excluding ?: words,

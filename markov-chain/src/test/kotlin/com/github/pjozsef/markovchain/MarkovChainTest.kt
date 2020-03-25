@@ -1,5 +1,6 @@
 package com.github.pjozsef.markovchain
 
+import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.asDice
@@ -62,7 +63,11 @@ class MarkovChainTest : FreeSpec({
             mapOf(
                 "" to listOf("A", "#"),
                 "A" to listOf("#")
-            ).markov().generate(1, 3, constraints = Constraints(minLength = 1)) shouldBe setOf("A")
+            ).markov().generate(
+                1, 3, constraints = Constraints(
+                    minLength = 1
+                )
+            ) shouldBe setOf("A")
         }
 
         "uses backward transition rules if 'endsWith' constraint is set" {
@@ -73,7 +78,9 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("B"),
                 "BB" to listOf("C"),
                 "BBC" to listOf("#")
-            ) withOrder 3 withConstraints Constraints(endsWith = "ASD") shouldGenerate "CBBASD"
+            ) withOrder 3 withConstraints Constraints(
+                endsWith = "ASD"
+            ) shouldGenerate "CBBASD"
         }
 
         "uses both way transitions and combines results" {
@@ -146,7 +153,12 @@ class MarkovChainTest : FreeSpec({
 
             "returns at least as much words as specified when using hybrid strategy" {
                 markovChain
-                    .generate(1, count, constraints = Constraints(startsWith = "q", endsWith = "x"))
+                    .generate(
+                        1, count, constraints = Constraints(
+                            startsWith = "q",
+                            endsWith = "x"
+                        )
+                    )
                     .size shouldBeGreaterThanOrEqual count
             }
         }

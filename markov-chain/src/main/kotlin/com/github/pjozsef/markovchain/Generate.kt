@@ -1,5 +1,6 @@
 package com.github.pjozsef.markovchain
 
+import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.asDice
 import java.util.*
