@@ -55,7 +55,7 @@ fun parseConstraint(stringConstraints: String) =
         newConstraints
     }
 
-private val lengthRegex by lazy { Regex("(?<min>\\d)?-(?<max>\\d)?") }
+private val lengthRegex by lazy { Regex("(?<min>\\d+)?-(?<max>\\d+)?") }
 private val contentRegex by lazy { Regex("(?<start>[^*]+)?\\*(?<contains>[^*]+)?\\*(?<end>[^*]+)?") }
 
 private fun newList(value: String, property: KProperty0<Collection<String>?>): List<String> {

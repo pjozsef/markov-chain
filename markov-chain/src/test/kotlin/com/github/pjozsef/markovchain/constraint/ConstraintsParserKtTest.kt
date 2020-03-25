@@ -15,9 +15,19 @@ class ConstraintsParserKtTest : FreeSpec({
                 Constraints(minLength = 2)
             ),
             row(
+                "min length multi digit",
+                "200-",
+                Constraints(minLength = 200)
+            ),
+            row(
                 "max length",
                 "-8",
                 Constraints(maxLength = 8)
+            ),
+            row(
+                "max length multi digit",
+                "-86",
+                Constraints(maxLength = 86)
             ),
             row(
                 "min-max length",
