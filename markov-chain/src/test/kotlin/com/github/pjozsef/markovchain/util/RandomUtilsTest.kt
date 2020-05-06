@@ -42,6 +42,12 @@ class RandomUtilsTest: FreeSpec({
                 coin.flip() shouldBe false
             }
         }
+        "equals is implemented" {
+            val coin1 = WeightedCoin(0.3, random)
+            val coin2 = WeightedCoin(0.3, random)
+
+            coin1 shouldBe coin2
+        }
         "statistics should reflect trueProbability" - {
             forall(
                 row(0.5),
@@ -108,7 +114,17 @@ class RandomUtilsTest: FreeSpec({
                 actual  shouldBe (expected plusOrMinus(0.01))
             }
         }
+        "equals is implemented" {
+            val probability = mapOf(
+                "A" to 1.0,
+                "B" to 1.0,
+                "C" to 3.0
+            )
+            val die1 = WeightedDice(probability, random)
+            val die2 = WeightedDice(probability, random)
 
+            die1 shouldBe die2
+        }
         "statistics should reflect probabilities" {
             forall(
                 row(listOf(0.5, 0.3, 0.2)),

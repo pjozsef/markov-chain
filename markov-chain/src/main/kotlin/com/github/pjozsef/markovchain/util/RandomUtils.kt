@@ -11,9 +11,27 @@ class WeightedCoin(val trueProbability: Double, val random: Random = Random()) {
     fun flip(): Boolean {
         return random.nextDouble() <= trueProbability
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as WeightedCoin
+
+        if (trueProbability != other.trueProbability) return false
+        if (random != other.random) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = trueProbability.hashCode()
+        result = 31 * result + random.hashCode()
+        return result
+    }
 }
 
-class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random()) {
+class WeightedDice<T>(val probabilities: Map<T, Number>, val random: Random = Random()) {
     constructor(
         values: List<T>,
         probabilities: List<Number>,
@@ -72,6 +90,24 @@ class WeightedDice<T>(probabilities: Map<T, Number>, val random: Random = Random
 
     fun roll(): T = random.nextInt(n).let { i ->
         if (flipCoin(prob[i], random)) values[i] else values[alias[i]]
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as WeightedDice<*>
+
+        if (probabilities != other.probabilities) return false
+        if (random != other.random) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = probabilities.hashCode()
+        result = 31 * result + random.hashCode()
+        return result
     }
 }
 
