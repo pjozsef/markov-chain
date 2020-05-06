@@ -7,7 +7,7 @@ buildscript {
     }
     configurations.maybeCreate('pitest')
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.70"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.71"
         classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.+'
         classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:+'
