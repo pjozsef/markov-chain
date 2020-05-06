@@ -119,6 +119,11 @@ class ConstraintsParserKtTest : FreeSpec({
                 "multiple excluding",
                 "ex1|,  ex2|ex3|",
                 Constraints(excluding = listOf("ex1", "ex2", "ex3"))
+            ),
+            row(
+                "ignores extra separators",
+                ",,, , 5-8, , a**b",
+                Constraints(minLength = 5, maxLength = 8, startsWith = "a", endsWith = "b")
             )
         ) { test, input, expected ->
             test {
