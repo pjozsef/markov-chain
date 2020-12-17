@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.generateWords
+import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
 import java.io.File
 
 class MainCommand : CliktCommand() {
@@ -41,16 +42,17 @@ class MainCommand : CliktCommand() {
         println(words)
 
         generateWords(
-            actualWords,
+            actualWords.toListOfChar() ?: error("empty input"),
             order,
             allowedRetries,
             count,
+            listOf('#'),
             seed?.toLong(RADIX_36),
             getConstraints()
         ).forEach(::println)
     }
 
-    private fun getConstraints() = Constraints(
+    private fun getConstraints() = Constraints.forWords(
         minLength,
         maxLength,
         startsWith,

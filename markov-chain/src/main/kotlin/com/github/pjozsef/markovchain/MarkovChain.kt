@@ -3,40 +3,46 @@ package com.github.pjozsef.markovchain
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.WordUtils
+import com.github.pjozsef.markovchain.util.WordUtils.endsWith
 
-internal typealias MapTransition = Map<String, WeightedDice<String>>
+internal typealias MapTransition<T> = Map<List<T>, WeightedDice<List<T>>>
 
-data class Transition(
-    val forward: MapTransition,
-    val backward: MapTransition
+data class Transition<T>(
+    val forward: MapTransition<T>,
+    val backward: MapTransition<T>
 )
 
-class MarkovChain(
-    val transition: Transition,
-    val end: String = "#",
+class MarkovChain<T>(
+    val transition: Transition<T>,
+    val end: List<T>,
     val allowedRetries: Int = 1_000_000
 ) {
 
     fun generate(
         order: Int = Int.MAX_VALUE,
         count: Int,
-        constraints: Constraints = Constraints()
+        constraints: Constraints<T> = Constraints()
     ) = generate(order, constraints, 0, count, emptySet(), emptySet(), emptySet())
 
     private tailrec fun generate(
         order: Int = Int.MAX_VALUE,
-        constraints: Constraints,
+        constraints: Constraints<T>,
         tries: Int,
         count: Int,
-        results: Set<String>,
-        bufferedStarts: Set<String>,
-        bufferedEnds: Set<String>
-    ): Collection<String> {
-        tailrec fun generateWord(current: String, transitionMap: MapTransition): String =
-            when (val next = next(current.takeLast(order), transitionMap)) {
-                end -> current
-                else -> generateWord(current + next, transitionMap)
+        results: Set<List<T>>,
+        bufferedStarts: Set<List<T>>,
+        bufferedEnds: Set<List<T>>
+    ): Collection<List<T>> {
+        tailrec fun generateWord(current: List<T>, transitionMap: MapTransition<T>): List<T> {
+            val next = next(current.takeLast(order), transitionMap)
+            val new = current + next
+
+            return if(new.endsWith(end)){
+                new.dropLast(end.size)
+            } else {
+                generateWord(new, transitionMap)
             }
+        }
 
         val isForwards = constraints.startsWith != null
         val isBackwards = constraints.endsWith != null
@@ -45,11 +51,11 @@ class MarkovChain(
             results.size >= count || tries >= allowedRetries -> results
             isForwards && isBackwards && constraints.hybridPrefixPostfix -> {
                 val newStarts = bufferedStarts + generateWord(
-                    constraints.startsWith ?: "",
+                    constraints.startsWith ?: emptyList(),
                     transition.forward
                 ).let(::setOf)
                 val newEnds = bufferedEnds + generateWord(
-                    constraints.endsWith?.reversed() ?: "",
+                    constraints.endsWith?.reversed() ?: emptyList(),
                     transition.backward
                 ).reversed().let(::setOf)
                 val newResults = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
@@ -57,11 +63,11 @@ class MarkovChain(
             }
             isForwards && isBackwards -> {
                 val forward = generateWord(
-                    constraints.startsWith ?: "",
+                    constraints.startsWith ?: emptyList(),
                     transition.forward
                 )
                 val backward = generateWord(
-                    constraints.endsWith?.reversed() ?: "",
+                    constraints.endsWith?.reversed() ?: emptyList(),
                     transition.backward
                 ).reversed()
                 val newResult = listOf(forward, backward).filter(constraints.evaluate::invoke)
@@ -69,7 +75,7 @@ class MarkovChain(
             }
             else -> {
                 val transitionMap = if (isBackwards) transition.backward else transition.forward
-                val prefix = constraints.endsWith?.reversed() ?: constraints.startsWith ?: ""
+                val prefix = constraints.endsWith?.reversed() ?: constraints.startsWith ?: emptyList()
                 val newResult = generateWord(prefix, transitionMap).let {
                     if (isBackwards) it.reversed() else it
                 }.let(::listOf).filter(constraints.evaluate::invoke)
@@ -79,9 +85,9 @@ class MarkovChain(
     }
 
     private tailrec fun next(
-        current: String,
-        transitionMap: MapTransition
-    ): String = when (val dice = transitionMap[current]) {
+        current: List<T>,
+        transitionMap: MapTransition<T>
+    ): List<T> = when (val dice = transitionMap[current]) {
         null -> next(current.drop(1), transitionMap)
         else -> dice.roll()
     }
