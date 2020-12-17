@@ -11,9 +11,10 @@ jobs:
       script: "./gradlew test"
     - stage: release
       script: "./gradlew bintrayUpload"
-      if: tag is present
+      if: branch = master and tag is present
     - stage: deploy
       script: skip
+      if: branch = master
       deploy: &heroku
         provider: heroku
         app: markov-chain-service
