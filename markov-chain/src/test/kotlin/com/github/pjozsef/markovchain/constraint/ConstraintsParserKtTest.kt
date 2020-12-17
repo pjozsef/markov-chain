@@ -1,5 +1,6 @@
 package com.github.pjozsef.markovchain.constraint
 
+import com.github.pjozsef.markovchain.testutil.l
 import io.kotlintest.IsolationMode
 import io.kotlintest.data.suspend.forall
 import io.kotlintest.shouldBe
@@ -47,58 +48,58 @@ class ConstraintsParserKtTest : FreeSpec({
             row(
                 "startsWith",
                 "prefix**",
-                Constraints(startsWith = "prefix")
+                Constraints(startsWith = "prefix".l)
             ),
             row(
                 "notStartsWith",
                 "!prefix**",
-                Constraints(notStartsWith = listOf("prefix"))
+                Constraints(notStartsWith = listOf("prefix".l))
             ),
             row(
                 "multiple notStartsWith",
                 "!prefix**, !p2**, !a**",
-                Constraints(notStartsWith = listOf("prefix", "p2", "a"))
+                Constraints(notStartsWith = listOf("prefix".l, "p2".l, "a".l))
             ),
-            row("endsWith", "**suffix", Constraints(endsWith = "suffix")),
+            row("endsWith", "**suffix", Constraints(endsWith = "suffix".l)),
             row(
                 "notEndsWith",
                 "**!suffix",
-                Constraints(notEndsWith = listOf("suffix"))
+                Constraints(notEndsWith = listOf("suffix".l))
             ),
             row(
                 "multiple notEndsWith",
                 "**!suffix, **!p2, **!a",
-                Constraints(notEndsWith = listOf("suffix", "p2", "a"))
+                Constraints(notEndsWith = listOf("suffix".l, "p2".l, "a".l))
             ),
             row(
                 "contains",
                 "*contains*",
-                Constraints(contains = listOf("contains"))
+                Constraints(contains = listOf("contains".l))
             ),
             row(
                 "multiple contains",
                 "*contains*, *a*, *b*",
-                Constraints(contains = listOf("contains", "a", "b"))
+                Constraints(contains = listOf("contains".l, "a".l, "b".l))
             ),
             row(
                 "notContains",
                 "*!contains*",
-                Constraints(notContains = listOf("contains"))
+                Constraints(notContains = listOf("contains".l))
             ),
             row(
                 "multiple notContains",
                 "*!contains*, *!a*, *!b*",
-                Constraints(notContains = listOf("contains", "a", "b"))
+                Constraints(notContains = listOf("contains".l, "a".l, "b".l))
             ),
             row(
                 "startsWith, contains, endsWith together",
                 "a*b*c",
-                Constraints(startsWith = "a", contains = listOf("b"), endsWith = "c")
+                Constraints(startsWith = "a".l, contains = listOf("b".l), endsWith = "c".l)
             ),
             row(
                 "notStartsWith, notContains, notEndsWith together",
                 "!a*!b*!c",
-                Constraints(notStartsWith = listOf("a"), notContains = listOf("b"), notEndsWith = listOf("c"))
+                Constraints(notStartsWith = listOf("a".l), notContains = listOf("b".l), notEndsWith = listOf("c".l))
             ),
             row(
                 "no hybrid prefix postfix strategy",
@@ -108,22 +109,22 @@ class ConstraintsParserKtTest : FreeSpec({
             row(
                 "excluding words",
                 "ex1|ex2|ex3",
-                Constraints(excluding = listOf("ex1", "ex2", "ex3"))
+                Constraints(excluding = listOf("ex1".l, "ex2".l, "ex3".l))
             ),
             row(
                 "excluding words trimmed",
                 "ex1 | ex2  |    ex3|     ||",
-                Constraints(excluding = listOf("ex1", "ex2", "ex3"))
+                Constraints(excluding = listOf("ex1".l, "ex2".l, "ex3".l))
             ),
             row(
                 "multiple excluding",
                 "ex1|,  ex2|ex3|",
-                Constraints(excluding = listOf("ex1", "ex2", "ex3"))
+                Constraints(excluding = listOf("ex1".l, "ex2".l, "ex3".l))
             ),
             row(
                 "ignores extra separators",
                 ",,, , 5-8, , a**b",
-                Constraints(minLength = 5, maxLength = 8, startsWith = "a", endsWith = "b")
+                Constraints(minLength = 5, maxLength = 8, startsWith = "a".l, endsWith = "b".l)
             )
         ) { test, input, expected ->
             test {

@@ -1,6 +1,7 @@
 package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.constraint.Constraints
+import com.github.pjozsef.markovchain.testutil.l
 import com.github.pjozsef.markovchain.util.TransitionRule
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.asDice
@@ -20,7 +21,16 @@ class MarkovChainTest : FreeSpec({
                 "" to listOf("A"),
                 "A" to listOf("B", "A", "B"),
                 "B" to listOf("A", "B", "#")
-            ) shouldGenerate "ABAABB"
+            ).l shouldGenerate "ABAABB".l
+        }
+
+        "generates char sequence with multi character delimiter" {
+            mapOf(
+                "" to listOf("A"),
+                "A" to listOf("B", "A", "B"),
+                "B" to listOf("A", "B", "#"),
+                "#" to listOf("#")
+            ).l withOrder 2 withDelimiter listOf("#", "#") shouldGenerate "ABAABB".l
         }
 
         "supports higher order transition" {
@@ -29,7 +39,7 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("A"),
                 "AAAA" to listOf("BB"),
                 "BB" to listOf("#")
-            ) shouldGenerate "AAAABB"
+            ).l shouldGenerate "AAAABB".l
         }
 
         "uses set order as maximum order" {
@@ -40,7 +50,7 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("#"),
                 "AABB" to listOf("C"),
                 "C" to listOf("#")
-            ) withOrder 2 shouldGenerate "AABB"
+            ).l withOrder 2 shouldGenerate "AABB".l
         }
 
         "starts generation with prefix if supplied" {
@@ -49,38 +59,38 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("#"),
                 "f" to listOf("C"),
                 "C" to listOf("#")
-            ) withConstraints Constraints(startsWith = "asdf") shouldGenerate "asdfC"
+            ).l withConstraints Constraints(startsWith = "asdf".l) shouldGenerate "asdfC".l
         }
 
         "uses constraints to verify generated text" {
             mapOf(
                 "" to listOf("AAAAAAA", "A"),
                 "A" to listOf("#")
-            ) withConstraints Constraints(maxLength = 1) shouldGenerate "A"
+            ).l withConstraints Constraints(maxLength = 1) shouldGenerate "A".l
         }
 
         "returns intermediate result once retry count reached" {
             mapOf(
                 "" to listOf("A", "#"),
                 "A" to listOf("#")
-            ).markov().generate(
+            ).l.markov().generate(
                 1, 3, constraints = Constraints(
                     minLength = 1
                 )
-            ) shouldBe setOf("A")
+            ) shouldBe setOf("A".l)
         }
 
         "uses backward transition rules if 'endsWith' constraint is set" {
             mapOf(
                 "" to listOf("#")
-            ) withBackwardRule mapOf(
+            ).l withBackwardRule mapOf(
                 "A" to listOf("B"),
                 "B" to listOf("B"),
                 "BB" to listOf("C"),
                 "BBC" to listOf("#")
-            ) withOrder 3 withConstraints Constraints(
-                endsWith = "ASD"
-            ) shouldGenerate "CBBASD"
+            ).l withOrder 3 withConstraints Constraints(
+                endsWith = "ASD".l
+            ) shouldGenerate "CBBASD".l
         }
 
         "uses both way transitions and combines results" {
@@ -89,20 +99,20 @@ class MarkovChainTest : FreeSpec({
                 "d" to listOf("e"),
                 "e" to listOf("r"),
                 "r" to listOf("#")
-            ) withBackwardRule mapOf(
+            ).l withBackwardRule mapOf(
                 "de" to listOf("r"),
                 "r" to listOf("o"),
                 "o" to listOf("l", "c"),
                 "l" to listOf("o"),
                 "c" to listOf("#")
-            ) withOrder 3 withConstraints Constraints(
+            ).l withOrder 3 withConstraints Constraints(
                 hybridPrefixPostfix = true,
-                startsWith = "fol",
-                endsWith = "ed"
+                startsWith = "fol".l,
+                endsWith = "ed".l
             ) shouldGenerate listOf(
-                "folored",
-                "folded",
-                "foldered"
+                "folored".l,
+                "folded".l,
+                "foldered".l
             )
         }
 
@@ -111,24 +121,24 @@ class MarkovChainTest : FreeSpec({
                 "fol" to listOf("d"),
                 "d" to listOf("e", "#"),
                 "e" to listOf("d")
-            ) withBackwardRule mapOf(
+            ).l withBackwardRule mapOf(
                 "de" to listOf("w"),
                 "w" to listOf("o"),
                 "l" to listOf("l", "o"),
                 "o" to listOf("l", "f"),
                 "f" to listOf("#")
-            ) withOrder 3 withConstraints Constraints(
+            ).l withOrder 3 withConstraints Constraints(
                 hybridPrefixPostfix = false,
-                startsWith = "fol",
-                endsWith = "ed"
+                startsWith = "fol".l,
+                endsWith = "ed".l
             )
             params.markov().generate(
                 order = 3,
                 count = 6,
                 constraints = params.constraints
             ) shouldBe setOf(
-                "folded",
-                "followed"
+                "folded".l,
+                "followed".l
             )
         }
 
@@ -140,10 +150,11 @@ class MarkovChainTest : FreeSpec({
                 "qux",
                 "quux",
                 "quuz"
-            )
+            ).map { it.l }
             val count = 10
 
-            val markovChain = MarkovChain(TransitionRule.fromWords(words).asDice())
+            val markovChain =
+                MarkovChain(TransitionRule.fromWords(words, delimiter = listOf("#")).asDice(), end = "#".l)
 
             "returned result size is as specified" {
                 markovChain
@@ -155,11 +166,27 @@ class MarkovChainTest : FreeSpec({
                 markovChain
                     .generate(
                         1, count, constraints = Constraints(
-                            startsWith = "q",
-                            endsWith = "x"
+                            startsWith = "q".l,
+                            endsWith = "x".l
                         )
                     )
                     .size shouldBeGreaterThanOrEqual count
+            }
+        }
+
+        "with generalized type" - {
+
+            "with multi delimiter" {
+                mapOf(
+                    listOf<Int>() to listOf(listOf(1)),
+                    listOf(1) to listOf(listOf(2)),
+                    listOf(2) to listOf(listOf(2)),
+                    listOf(2, 2) to listOf(listOf(3)),
+                    listOf(3) to listOf(listOf(0)),
+                    listOf(0) to listOf(listOf(0))
+                ) withOrder 2 withDelimiter listOf(0) shouldGenerate listOf(
+                    listOf(1, 2, 2, 3)
+                )
             }
         }
     }
@@ -168,52 +195,56 @@ class MarkovChainTest : FreeSpec({
     override fun isolationMode() = IsolationMode.InstancePerLeaf
 }
 
-private data class TestParameters(
-    val mockForwardTransitions: Map<String, List<String>>,
-    val mockBackwardTransitions: Map<String, List<String>> = emptyMap(),
+private data class TestParameters<T>(
+    val mockForwardTransitions: Map<List<T>, List<List<T>>>,
+    val mockBackwardTransitions: Map<List<T>, List<List<T>>> = emptyMap(),
     val order: Int = Int.MAX_VALUE,
-    val constraints: Constraints = Constraints(),
-    val retryCount: Int = 2
+    val constraints: Constraints<T> = Constraints(),
+    val retryCount: Int = 2,
+    val delimiter: List<T>? = null
 )
 
-private infix fun Map<String, List<String>>.withOrder(order: Int): TestParameters =
+private infix fun <T> Map<List<T>, List<List<T>>>.withOrder(order: Int): TestParameters<T> =
     TestParameters(this, order = order)
 
-private infix fun TestParameters.withOrder(order: Int): TestParameters =
+private infix fun <T> TestParameters<T>.withOrder(order: Int): TestParameters<T> =
     this.copy(order = order)
 
-private infix fun Map<String, List<String>>.withConstraints(constraints: Constraints): TestParameters =
-    TestParameters(this, constraints = constraints)
+private infix fun <T> Map<List<T>, List<List<T>>>.withConstraints(constraints: Constraints<T>): TestParameters<T> =
+    TestParameters<T>(this, constraints = constraints)
 
-private infix fun TestParameters.withConstraints(constraints: Constraints): TestParameters =
+private infix fun <T> TestParameters<T>.withConstraints(constraints: Constraints<T>): TestParameters<T> =
     this.copy(constraints = constraints)
 
-private infix fun Map<String, List<String>>.withBackwardRule(that: Map<String, List<String>>): TestParameters =
+private infix fun <T> TestParameters<T>.withDelimiter(delimiter: List<T>): TestParameters<T> =
+    this.copy(delimiter = delimiter)
+
+private infix fun <T> Map<List<T>, List<List<T>>>.withBackwardRule(that: Map<List<T>, List<List<T>>>): TestParameters<T> =
     TestParameters(this, that)
 
-private infix fun Map<String, List<String>>.shouldGenerate(result: String) =
+private infix fun <T> Map<List<T>, List<List<T>>>.shouldGenerate(result: List<T>) =
     TestParameters(this).shouldGenerate(result)
 
-private infix fun TestParameters.shouldGenerate(result: String) =
+private infix fun <T> TestParameters<T>.shouldGenerate(result: List<T>) =
     this shouldGenerate setOf(result)
 
-private infix fun TestParameters.shouldGenerate(result: Collection<String>) {
+private infix fun <T> TestParameters<T>.shouldGenerate(result: Collection<List<T>>) {
     this.markov().generate(order = this.order, count = 1, constraints = this.constraints) shouldBe result.toSet()
 }
 
-private fun Map<String, List<String>>.markov() = TestParameters(this).markov()
+private fun <T> Map<List<T>, List<List<T>>>.markov() = TestParameters(this).markov()
 
-private fun TestParameters.markov() = MarkovChain(
+private fun <T> TestParameters<T>.markov() = MarkovChain(
     Transition(
         this.mockForwardTransitions.generateDice(),
         this.mockBackwardTransitions.generateDice()
     ),
-    "#",
+    this.delimiter ?: listOf("#") as List<T>,
     this.retryCount
 )
 
-private fun Map<String, List<String>>.generateDice(): MapTransition = this.mapValues { (_, returnValues) ->
-    mock<WeightedDice<String>> {
+private fun <T> Map<List<T>, List<List<T>>>.generateDice(): MapTransition<T> = this.mapValues { (_, returnValues) ->
+    mock<WeightedDice<List<T>>> {
         on { roll() } doReturnConsecutively returnValues
     }
 }

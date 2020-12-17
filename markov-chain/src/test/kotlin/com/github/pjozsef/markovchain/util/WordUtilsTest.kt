@@ -1,5 +1,9 @@
 package com.github.pjozsef.markovchain.util
 
+import com.github.pjozsef.markovchain.testutil.l
+import com.github.pjozsef.markovchain.util.WordUtils.containsList
+import com.github.pjozsef.markovchain.util.WordUtils.endsWith
+import com.github.pjozsef.markovchain.util.WordUtils.startsWith
 import io.kotlintest.IsolationMode
 import io.kotlintest.data.suspend.forall
 import io.kotlintest.shouldBe
@@ -12,38 +16,38 @@ class WordUtilsTest : FreeSpec({
         forall(
             row(
                 "returns all combinations of words at matching letters",
-                "red",
-                "dimension",
+                "red".l,
+                "dimension".l,
                 setOf(
-                    "rension",
-                    "redimension"
+                    "rension".l,
+                    "redimension".l
                 )
             ),
             row(
                 "returns words without duplication",
-                "folder",
-                "colored",
+                "folder".l,
+                "colored".l,
                 setOf(
-                    "folored",
-                    "fored",
-                    "fold",
-                    "folded",
-                    "foldered"
+                    "folored".l,
+                    "fored".l,
+                    "fold".l,
+                    "folded".l,
+                    "foldered".l
                 )
             ),
             row(
                 "returns words without duplication #2",
-                "endure",
-                "red",
+                "endure".l,
+                "red".l,
                 setOf(
-                    "ed",
-                    "end",
-                    "endured"
+                    "ed".l,
+                    "end".l,
+                    "endured".l
                 )
             )
         ) { test, first, second, expected ->
             test {
-                WordUtils.combineWords(first, second) shouldBe expected
+                WordUtils.combineSingleWords(first, second) shouldBe expected
             }
         }
     }
@@ -51,31 +55,31 @@ class WordUtilsTest : FreeSpec({
     "combine multiple words" - {
         "should return the union of all combinations" {
             val startWords = listOf(
-                "follow",
-                "folder",
-                "red"
+                "follow".l,
+                "folder".l,
+                "red".l
             )
             val endWords = listOf(
-                "endure",
-                "dimension",
-                "cinema"
+                "endure".l,
+                "dimension".l,
+                "cinema".l
             )
             val expected = setOf(
-                "fon",
-                "follon",
-                "foldure",
-                "foldendure",
-                "folde",
-                "foldere",
-                "foldimension",
-                "foldension",
-                "foldema",
-                "re",
-                "rendure",
-                "redure",
-                "rension",
-                "redimension",
-                "rema"
+                "fon".l,
+                "follon".l,
+                "foldure".l,
+                "foldendure".l,
+                "folde".l,
+                "foldere".l,
+                "foldimension".l,
+                "foldension".l,
+                "foldema".l,
+                "re".l,
+                "rendure".l,
+                "redure".l,
+                "rension".l,
+                "redimension".l,
+                "rema".l
             )
             WordUtils.combineWords(startWords, endWords) shouldBe expected
         }
@@ -84,22 +88,62 @@ class WordUtilsTest : FreeSpec({
     "commonPostfixPrefixLength" - {
         "calculates the shared length of first word's postfix and second word's prefix" {
             WordUtils.commonPostfixPrefixLength(
-                "accomodate",
-                "datenbank"
+                "accomodate".l,
+                "datenbank".l
             ) shouldBe 4
         }
-        "calculates the larges shared substring's length" {
+        "calculates the largest shared substring's length" {
             WordUtils.commonPostfixPrefixLength(
-                "ccccada",
-                "adaqqqq"
+                "ccccada".l,
+                "adaqqqq".l
             ) shouldBe 3
         }
 
         "returns 0 if the second word does not start with the first's end" {
             WordUtils.commonPostfixPrefixLength(
-                "nothing",
-                "common"
+                "nothing".l,
+                "common".l
             ) shouldBe 0
+        }
+    }
+
+    "startsWith" {
+        forall(
+            row(listOf(), listOf(), true),
+            row(listOf("a", "b"), listOf("c"), false),
+            row(listOf("a"), listOf("a"), true),
+            row(listOf("a", "a", "c"), listOf("a", "a"), true),
+            row(listOf("a", "b"), listOf("a", "b", "c"), false)
+        ) { list, prefix, expected ->
+            list.startsWith(prefix) shouldBe expected
+        }
+    }
+
+    "endsWith" {
+        forall(
+            row(listOf(), listOf(), true),
+            row(listOf("a", "b"), listOf("c"), false),
+            row(listOf("a"), listOf("a"), true),
+            row(listOf("a", "a"), listOf("a"), true),
+            row(listOf("b", "a", "c"), listOf("a", "c"), true),
+            row(listOf("a", "b"), listOf("a", "b", "c"), false)
+        ) { list, suffix, expected ->
+            list.endsWith(suffix) shouldBe expected
+        }
+    }
+
+    "containsList" {
+        forall(
+            row(listOf(), listOf(), true),
+            row(listOf("a", "b"), listOf("c"), false),
+            row(listOf("a"), listOf("a"), true),
+            row(listOf("a", "a"), listOf("a"), true),
+            row(listOf("a", "a"), listOf("a", "a"), true),
+            row(listOf("b", "a"), listOf("a"), true),
+            row(listOf("a", "a", "b", "a", "a"), listOf("a", "b", "a"), true),
+            row(listOf("a", "b"), listOf("a", "b", "c"), false)
+        ) { list, content, expected ->
+            list.containsList(content) shouldBe expected
         }
     }
 }) {
