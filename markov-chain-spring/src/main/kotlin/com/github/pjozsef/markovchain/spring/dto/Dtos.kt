@@ -23,7 +23,7 @@ data class ConstraintsDto(
     val hybridPrefixPostfix: Boolean = true
 )
 
-fun MarkovChainRequestDto.toConstraints() = Constraints(
+fun MarkovChainRequestDto.toConstraints() = Constraints.forWords(
     constraints.minLength,
     constraints.maxLength,
     constraints.startsWith,

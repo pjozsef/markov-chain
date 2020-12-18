@@ -1,8 +1,9 @@
 package com.github.pjozsef.markovchain.constraint
 
+import com.github.pjozsef.markovchain.util.WordUtils.list
 import kotlin.reflect.KProperty0
 
-fun parseConstraint(stringConstraints: String) =
+fun parseConstraint(stringConstraints: String): Constraints<String> =
     stringConstraints.split(",").map {
         it.trim()
     }.fold(Constraints()) { constraints, input ->
@@ -22,7 +23,7 @@ fun parseConstraint(stringConstraints: String) =
                 if (it.startsWith("!")) {
                     newConstraints = newConstraints.copy(notStartsWith = newList(it, newConstraints::notStartsWith))
                 } else {
-                    newConstraints = newConstraints.copy(startsWith = it)
+                    newConstraints = newConstraints.copy(startsWith = it.list)
                 }
             }
             it.groups["contains"]?.value?.also {
@@ -36,7 +37,7 @@ fun parseConstraint(stringConstraints: String) =
                 if (it.startsWith("!")) {
                     newConstraints = newConstraints.copy(notEndsWith = newList(it, newConstraints::notEndsWith))
                 } else {
-                    newConstraints = newConstraints.copy(endsWith = it)
+                    newConstraints = newConstraints.copy(endsWith = it.list)
                 }
             }
         }
@@ -47,7 +48,8 @@ fun parseConstraint(stringConstraints: String) =
 
         if (input.contains("|")) {
             input.split("|").map { it.trim() }.filter { it.isNotBlank() }.also {
-                val excludingList = newConstraints.excluding?.plus(it) ?: it
+                val list = it.map{ it.list }
+                val excludingList = newConstraints.excluding?.plus(list) ?: list
                 newConstraints = newConstraints.copy(excluding = excludingList)
             }
         }
@@ -58,8 +60,8 @@ fun parseConstraint(stringConstraints: String) =
 private val lengthRegex by lazy { Regex("(?<min>\\d+)?-(?<max>\\d+)?") }
 private val contentRegex by lazy { Regex("(?<start>[^*]+)?\\*(?<contains>[^*]+)?\\*(?<end>[^*]+)?") }
 
-private fun newList(value: String, property: KProperty0<Collection<String>?>): List<String> {
+private fun newList(value: String, property: KProperty0<Collection<List<String>>?>): List<List<String>> {
     val element = if (value.startsWith("!")) value.drop(1) else value
-    val elementList = listOf(element)
+    val elementList = listOf(element.list)
     return property.get()?.plus(elementList) ?: elementList
 }

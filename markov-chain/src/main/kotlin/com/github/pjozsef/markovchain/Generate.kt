@@ -7,21 +7,23 @@ import java.util.*
 
 private const val RADIX_36 = 36
 
-fun generateWords(
-    words: List<String>,
+fun <T> generateWords(
+    words: List<List<T>>,
     order: Int,
     allowedRetries: Int,
     count: Int,
+    delimiter: List<T>,
     seed: Long?,
-    constraints: Constraints
-): Iterable<String> {
+    constraints: Constraints<T>
+): Iterable<List<T>> {
     val random = initializeRandom(seed)
-
     val chain = MarkovChain(
         TransitionRule.fromWords(
             words,
+            delimiter = delimiter,
             order = order
         ).asDice(random),
+        end = delimiter,
         allowedRetries = allowedRetries
     )
     return chain.generate(
@@ -30,7 +32,6 @@ fun generateWords(
         constraints = constraints
     ).shuffled(random)
         .take(count)
-        .toSortedSet()
 }
 
 private fun initializeRandom(seed: Long?): Random {

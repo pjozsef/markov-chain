@@ -1,5 +1,6 @@
 package com.github.pjozsef.markovchain.util
 
+import com.github.pjozsef.markovchain.testutil.l
 import io.kotlintest.IsolationMode
 import io.kotlintest.data.suspend.forall
 import io.kotlintest.shouldBe
@@ -10,12 +11,12 @@ import io.kotlintest.tables.row
 class TransitionRuleUtilsTest : FreeSpec({
     "TransitionRuleUtils" - {
         val words = listOf(
-            "foo",
-            "bar",
-            "baz",
-            "qux",
-            "quux",
-            "quuz"
+            "foo".l,
+            "bar".l,
+            "baz".l,
+            "qux".l,
+            "quux".l,
+            "quuz".l
         )
 
         forall(
@@ -211,12 +212,21 @@ class TransitionRuleUtilsTest : FreeSpec({
             )
         ) { order, expectedForward, expectedBackward ->
             "converts words into rules $order" {
-                val (forward, backward) = TransitionRule.fromWords(words, order)
-                forward shouldBe expectedForward
-                backward shouldBe expectedBackward
+                val (forward, backward) = TransitionRule.fromWords(words, order, listOf("#"))
+                forward shouldBe expectedForward.transform()
+                backward shouldBe expectedBackward.transform()
             }
         }
     }
 }) {
     override fun isolationMode() = IsolationMode.InstancePerLeaf
 }
+
+private fun Map<String, Map<String, Int>>.transform(): Map<List<String>, Map<List<String>, Int>> =
+    this.mapKeys {
+        it.key.l
+    }.mapValues {
+        it.value.mapKeys {
+            it.key.l
+        }
+    }

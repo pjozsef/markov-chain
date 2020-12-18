@@ -3,14 +3,14 @@ package com.github.pjozsef.markovchain.util
 import com.github.pjozsef.markovchain.Transition
 import java.util.*
 
-internal typealias RawTransition = Pair<Map<String, Map<String, Number>>, Map<String, Map<String, Number>>>
+internal typealias RawTransition<T> = Pair<Map<List<T>, Map<List<T>, Number>>, Map<List<T>, Map<List<T>, Number>>>
 
 object TransitionRule {
-    fun fromWords(words: List<String>, order: Int = 1, delimiter: String = "#"): RawTransition =
+    fun <T> fromWords(words: List<List<T>>, order: Int = 1, delimiter: List<T>): RawTransition<T> =
         words.fromWords(order, delimiter) to words.map { it.reversed() }.fromWords(order, delimiter)
 }
 
-private fun List<String>.fromWords(order: Int = 1, delimiter: String = "#"): Map<String, Map<String, Number>> =
+private fun <T> List<List<T>>.fromWords(order: Int = 1, delimiter: List<T>): Map<List<T>, Map<List<T>, Number>> =
     this.map { it + delimiter }.let { wordsWithEnding ->
         (0..order).map {
             wordsWithEnding.generateRules(it)
@@ -19,27 +19,27 @@ private fun List<String>.fromWords(order: Int = 1, delimiter: String = "#"): Map
         }
     }
 
-private fun List<String>.generateRules(order: Int): Map<String, Map<String, Number>> = when (order) {
+private fun <T> List<List<T>>.generateRules(order: Int): Map<List<T>, Map<List<T>, Number>> = when (order) {
     0 -> this.generateRules { map { it.take(1) } }
     else -> this.generateRules { flatMap { it.windowed(order + 1) } }
 }
 
-private fun List<String>.generateRules(transform: List<String>.() -> List<String>) =
+private fun <T> List<List<T>>.generateRules(transform: List<List<T>>.() -> List<List<T>>) =
     this.transform()
         .map {
             it.dropLast(1) to it.takeLast(1)
-        }.fold(mapOf<String, List<String>>()) { acc, curr ->
+        }.fold(mapOf<List<T>, List<List<T>>>()) { acc, curr ->
             acc merge curr
         }.mapValues { (_, value) ->
             value.groupingBy { it }.eachCount()
         }
 
-private infix fun <K, V> Map<K, List<V>>.merge(pair: Pair<K, V>): Map<K, List<V>> {
+private infix fun <K, V> Map<List<K>, List<List<V>>>.merge(pair: Pair<List<K>, List<V>>): Map<List<K>, List<List<V>>> {
     val (key, value) = pair
     return this + mapOf(key to (this.getOrDefault(key, listOf())) + listOf(value))
 }
 
-fun RawTransition.asDice(random: Random = Random()) = Transition(
+fun <T> RawTransition<T>.asDice(random: Random = Random()) = Transition(
     this.first.mapValues { (_, value) -> WeightedDice(value, random) },
     this.second.mapValues { (_, value) -> WeightedDice(value, random) }
 )
