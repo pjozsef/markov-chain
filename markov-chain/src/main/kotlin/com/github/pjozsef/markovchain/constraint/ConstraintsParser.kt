@@ -3,7 +3,7 @@ package com.github.pjozsef.markovchain.constraint
 import com.github.pjozsef.markovchain.util.WordUtils.list
 import kotlin.reflect.KProperty0
 
-fun parseConstraint(stringConstraints: String): Constraints<String> =
+fun parseConstraint(stringConstraints: String): Constraints<Char> =
     stringConstraints.split(",").map {
         it.trim()
     }.fold(Constraints()) { constraints, input ->
@@ -60,7 +60,7 @@ fun parseConstraint(stringConstraints: String): Constraints<String> =
 private val lengthRegex by lazy { Regex("(?<min>\\d+)?-(?<max>\\d+)?") }
 private val contentRegex by lazy { Regex("(?<start>[^*]+)?\\*(?<contains>[^*]+)?\\*(?<end>[^*]+)?") }
 
-private fun newList(value: String, property: KProperty0<Collection<List<String>>?>): List<List<String>> {
+private fun newList(value: String, property: KProperty0<Collection<List<Char>>?>): List<List<Char>> {
     val element = if (value.startsWith("!")) value.drop(1) else value
     val elementList = listOf(element.list)
     return property.get()?.plus(elementList) ?: elementList

@@ -32,8 +32,8 @@ object WordUtils {
         this.windowed(content.size).any { it == content }
     }
 
-    val String.list: List<String>
-        get() = this.toCharArray().map(Char::toString)
+    val String.list: List<Char>
+        get() = this.toCharArray().toList()
 
     fun String?.toListOfChar() = this?.toCharArray()?.toList()
 
