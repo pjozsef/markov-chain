@@ -2,6 +2,7 @@ package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
+import com.github.pjozsef.markovchain.util.charCommentFilter
 import io.kotlintest.IsolationMode
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
@@ -23,7 +24,8 @@ class GenerateKtTest: FreeSpec({
                 minLength = 4,
                 maxLength = 10,
                 excluding = baseWords
-            )
+            ),
+            commentFilter = charCommentFilter()
         ).map { it.joinToString("") }.sorted()
 
         val snapshotWords = read("/snapshot/female_names_output.txt")

@@ -6,8 +6,18 @@ import java.util.*
 internal typealias RawTransition<T> = Pair<Map<List<T>, Map<List<T>, Number>>, Map<List<T>, Map<List<T>, Number>>>
 
 object TransitionRule {
-    fun <T> fromWords(words: List<List<T>>, order: Int = 1, delimiter: List<T>): RawTransition<T> =
-        words.fromWords(order, delimiter) to words.map { it.reversed() }.fromWords(order, delimiter)
+    fun <T> fromWords(words: List<List<T>>, order: Int = 1, delimiter: List<T>, commentFilter: (List<T>)->Boolean): RawTransition<T> {
+        val filteredWords = words.filter(commentFilter)
+        return filteredWords.fromWords(order, delimiter) to filteredWords.map { it.reversed() }.fromWords(order, delimiter)
+    }
+}
+
+fun stringCommentFilter(comment: String = "#"): (List<String>) -> Boolean = {
+    !it.first().startsWith(comment)
+}
+
+fun charCommentFilter(comment: Char = '#'): (List<Char>) -> Boolean = {
+    it.first() != comment
 }
 
 private fun <T> List<List<T>>.fromWords(order: Int = 1, delimiter: List<T>): Map<List<T>, Map<List<T>, Number>> =

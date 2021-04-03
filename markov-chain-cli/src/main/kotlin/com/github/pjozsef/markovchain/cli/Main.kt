@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.generateWords
 import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
+import com.github.pjozsef.markovchain.util.charCommentFilter
 import java.io.File
 
 class MainCommand : CliktCommand() {
@@ -48,7 +49,8 @@ class MainCommand : CliktCommand() {
             count,
             listOf('#'),
             seed?.toLong(RADIX_36),
-            getConstraints()
+            getConstraints(),
+            charCommentFilter()
         ).forEach(::println)
     }
 

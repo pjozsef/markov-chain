@@ -4,6 +4,7 @@ import com.github.pjozsef.markovchain.generateWords
 import com.github.pjozsef.markovchain.spring.dto.MarkovChainRequestDto
 import com.github.pjozsef.markovchain.spring.dto.toConstraints
 import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
+import com.github.pjozsef.markovchain.util.charCommentFilter
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -24,7 +25,8 @@ class MarkovChainController {
                     15,
                     listOf('#'),
                     seed,
-                    toConstraints()
+                    toConstraints(),
+                    charCommentFilter()
                 ).map { it.joinToString("") }
             }
         }

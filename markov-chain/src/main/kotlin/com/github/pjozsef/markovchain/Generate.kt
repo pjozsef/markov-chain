@@ -14,14 +14,16 @@ fun <T> generateWords(
     count: Int,
     delimiter: List<T>,
     seed: Long?,
-    constraints: Constraints<T>
+    constraints: Constraints<T>,
+    commentFilter: (List<T>)->Boolean
 ): Iterable<List<T>> {
     val random = initializeRandom(seed)
     val chain = MarkovChain(
         TransitionRule.fromWords(
             words,
             delimiter = delimiter,
-            order = order
+            order = order,
+            commentFilter = commentFilter
         ).asDice(random),
         end = delimiter,
         allowedRetries = allowedRetries

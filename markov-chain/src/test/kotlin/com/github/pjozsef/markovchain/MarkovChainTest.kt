@@ -2,9 +2,7 @@ package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.testutil.l
-import com.github.pjozsef.markovchain.util.TransitionRule
-import com.github.pjozsef.markovchain.util.WeightedDice
-import com.github.pjozsef.markovchain.util.asDice
+import com.github.pjozsef.markovchain.util.*
 import com.nhaarman.mockitokotlin2.doReturnConsecutively
 import com.nhaarman.mockitokotlin2.mock
 import io.kotlintest.IsolationMode
@@ -154,7 +152,7 @@ class MarkovChainTest : FreeSpec({
             val count = 10
 
             val markovChain =
-                MarkovChain(TransitionRule.fromWords(words, delimiter = listOf("#")).asDice(), end = "#".l)
+                MarkovChain(TransitionRule.fromWords(words, delimiter = listOf("#"), commentFilter = stringCommentFilter()).asDice(), end = "#".l)
 
             "returned result size is as specified" {
                 markovChain

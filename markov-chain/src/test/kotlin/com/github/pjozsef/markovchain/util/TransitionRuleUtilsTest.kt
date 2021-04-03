@@ -11,6 +11,8 @@ import io.kotlintest.tables.row
 class TransitionRuleUtilsTest : FreeSpec({
     "TransitionRuleUtils" - {
         val words = listOf(
+            "%comment1".l,
+            "%comment2".l,
             "foo".l,
             "bar".l,
             "baz".l,
@@ -212,7 +214,7 @@ class TransitionRuleUtilsTest : FreeSpec({
             )
         ) { order, expectedForward, expectedBackward ->
             "converts words into rules $order" {
-                val (forward, backward) = TransitionRule.fromWords(words, order, listOf("#"))
+                val (forward, backward) = TransitionRule.fromWords(words, order, listOf("#"), stringCommentFilter("%"))
                 forward shouldBe expectedForward.transform()
                 backward shouldBe expectedBackward.transform()
             }
