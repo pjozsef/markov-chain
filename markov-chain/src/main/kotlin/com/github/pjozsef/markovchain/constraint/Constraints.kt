@@ -16,10 +16,11 @@ data class Constraints<T>(
     val contains: Collection<List<T>>? = null,
     val notContains: Collection<List<T>>? = null,
     val excluding: Collection<List<T>>? = null,
+    val filters: Collection<(List<T>) -> Boolean>? = null,
     val hybridPrefixPostfix: Boolean = true
 ) {
 
-    companion object{
+    companion object {
         fun forWords(
             minLength: Int? = null,
             maxLength: Int? = null,
@@ -30,6 +31,7 @@ data class Constraints<T>(
             contains: Collection<String>? = null,
             notContains: Collection<String>? = null,
             excluding: Collection<String>? = null,
+            filters: Collection<(String) -> Boolean>? = null,
             hybridPrefixPostfix: Boolean = true
         ): Constraints<Char> {
             return Constraints(
@@ -42,6 +44,11 @@ data class Constraints<T>(
                 contains.toListOfChar(),
                 notContains.toListOfChar(),
                 excluding.toListOfChar(),
+                filters?.map {
+                    { word: List<Char> ->
+                        it(word.toString())
+                    }
+                },
                 hybridPrefixPostfix
             )
         }
@@ -79,12 +86,13 @@ data class Constraints<T>(
             minLength?.let { { input: List<T> -> it <= input.size } },
             maxLength?.let { { input: List<T> -> input.size <= it } },
             startsWith?.let { { input: List<T> -> input.startsWith(it) } },
-            notStartsWith?.let { { input: List<T> -> it.none{ input.startsWith(it) }} },
+            notStartsWith?.let { { input: List<T> -> it.none { input.startsWith(it) } } },
             endsWith?.let { { input: List<T> -> input.endsWith(it) } },
-            notEndsWith?.let { { input: List<T> -> it.none{ input.endsWith(it) }} },
+            notEndsWith?.let { { input: List<T> -> it.none { input.endsWith(it) } } },
             contains?.let { { input: List<T> -> it.all { input.containsList(it) } } },
             notContains?.let { { input: List<T> -> it.none { input.containsList(it) } } },
-            excluding?.let { { input: List<T> -> !it.contains(input) } }
+            excluding?.let { { input: List<T> -> !it.contains(input) } },
+            filters?.let { { input: List<T> -> it.all { it(input) } } }
         ).let { predicates ->
             { input -> predicates.all { it(input) } }
         }

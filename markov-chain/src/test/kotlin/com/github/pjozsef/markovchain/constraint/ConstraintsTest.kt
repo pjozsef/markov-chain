@@ -244,6 +244,18 @@ class ConstraintsTest : FreeSpec({
                 true to listOf("as_".l, "_as".l, "_as_".l, "asdf".l, "_df".l, "df_".l, "_df_".l)
             )
         }
+
+        "custom filters" {
+            Constraints(
+                filters = listOf(
+                    { input: List<String> -> input.firstOrNull() == "a" },
+                    { input: List<String> -> input.lastOrNull() == "z" }
+                )
+            ) testWith mapOf(
+                false to listOf("".l, "b".l, "a".l, "z".l, "aza".l),
+                true to listOf("az".l, "asdfjklz".l)
+            )
+        }
     }
 
     "forWords" - {
