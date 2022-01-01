@@ -1,19 +1,6 @@
 version = parent.version
 group = parent.group
 
-apply plugin: 'info.solidsoft.pitest'
-apply from: "$rootDir/release.gradle"
-
-
-pitest {
-    pitestVersion = '1.4.10'
-    testPlugin.set("junit5")
-    targetClasses.set(['com.github.pjozsef.markovchain.*'])
-    avoidCallsTo.set(['org.slf4j', 'kotlin.jvm.internal.Intrinsics'])
-    threads.set(4)
-    outputFormats.set(['XML', 'HTML'])
-}
-
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
