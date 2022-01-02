@@ -16,7 +16,7 @@ data class Constraints<T>(
     val contains: Collection<List<T>>? = null,
     val notContains: Collection<List<T>>? = null,
     val excluding: Collection<List<T>>? = null,
-    val filters: Collection<(List<T>) -> Boolean>? = null,
+    val customConstraints: Collection<(List<T>) -> Boolean>? = null,
     val hybridPrefixPostfix: Boolean = true
 ) {
 
@@ -31,7 +31,7 @@ data class Constraints<T>(
             contains: Collection<String>? = null,
             notContains: Collection<String>? = null,
             excluding: Collection<String>? = null,
-            filters: Collection<(String) -> Boolean>? = null,
+            customConstraints: Collection<(String) -> Boolean>? = null,
             hybridPrefixPostfix: Boolean = true
         ): Constraints<Char> {
             return Constraints(
@@ -44,7 +44,7 @@ data class Constraints<T>(
                 contains.toListOfChar(),
                 notContains.toListOfChar(),
                 excluding.toListOfChar(),
-                filters?.map {
+                customConstraints?.map {
                     { word: List<Char> ->
                         it(word.toString())
                     }
@@ -92,7 +92,7 @@ data class Constraints<T>(
             contains?.let { { input: List<T> -> it.all { input.containsList(it) } } },
             notContains?.let { { input: List<T> -> it.none { input.containsList(it) } } },
             excluding?.let { { input: List<T> -> !it.contains(input) } },
-            filters?.let { { input: List<T> -> it.all { it(input) } } }
+            customConstraints?.let { { input: List<T> -> it.all { it(input) } } }
         ).let { predicates ->
             { input -> predicates.all { it(input) } }
         }

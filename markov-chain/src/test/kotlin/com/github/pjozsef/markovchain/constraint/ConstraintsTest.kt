@@ -245,9 +245,9 @@ class ConstraintsTest : FreeSpec({
             )
         }
 
-        "custom filters" {
+        "custom constraints" {
             Constraints(
-                filters = listOf(
+                customConstraints = listOf(
                     { input: List<String> -> input.firstOrNull() == "a" },
                     { input: List<String> -> input.lastOrNull() == "z" }
                 )
