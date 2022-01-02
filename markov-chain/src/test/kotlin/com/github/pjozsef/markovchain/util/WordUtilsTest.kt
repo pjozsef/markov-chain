@@ -85,6 +85,15 @@ class WordUtilsTest : FreeSpec({
         }
     }
 
+    "commonPostfixPrefixLength List" - {
+        "calculates the minimum from each pairing" {
+            WordUtils.commonPostfixPrefixMultiLength(
+                listOf("accomodate".l),
+                listOf("datenbank".l, "eta".l)
+            ) shouldBe 1
+        }
+    }
+
     "commonPostfixPrefixLength" - {
         "calculates the shared length of first word's postfix and second word's prefix" {
             WordUtils.commonPostfixPrefixLength(

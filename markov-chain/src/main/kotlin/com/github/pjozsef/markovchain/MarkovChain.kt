@@ -4,6 +4,8 @@ import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.WeightedDice
 import com.github.pjozsef.markovchain.util.WordUtils
 import com.github.pjozsef.markovchain.util.WordUtils.endsWith
+import com.github.pjozsef.markovchain.util.randomElement
+import java.util.*
 
 internal typealias MapTransition<T> = Map<List<T>, WeightedDice<List<T>>>
 
@@ -15,6 +17,7 @@ data class Transition<T>(
 class MarkovChain<T>(
     val transition: Transition<T>,
     val end: List<T>,
+    val random: Random,
     val allowedRetries: Int = 1_000_000
 ) {
 
@@ -51,11 +54,11 @@ class MarkovChain<T>(
             results.size >= count || tries >= allowedRetries -> results
             isForwards && isBackwards && constraints.hybridPrefixPostfix -> {
                 val newStarts = bufferedStarts + generateWord(
-                    constraints.startsWith ?: emptyList(),
+                    constraints.startsWith?.randomElement(random) ?: emptyList(),
                     transition.forward
                 ).let(::setOf)
                 val newEnds = bufferedEnds + generateWord(
-                    constraints.endsWith?.reversed() ?: emptyList(),
+                    constraints.endsWith?.randomElement(random)?.reversed() ?: emptyList(),
                     transition.backward
                 ).reversed().let(::setOf)
                 val newResults = WordUtils.combineWords(newStarts, newEnds).filter(constraints.evaluate::invoke)
@@ -63,11 +66,11 @@ class MarkovChain<T>(
             }
             isForwards && isBackwards -> {
                 val forward = generateWord(
-                    constraints.startsWith ?: emptyList(),
+                    constraints.startsWith?.randomElement(random) ?: emptyList(),
                     transition.forward
                 )
                 val backward = generateWord(
-                    constraints.endsWith?.reversed() ?: emptyList(),
+                    constraints.endsWith?.randomElement(random)?.reversed() ?: emptyList(),
                     transition.backward
                 ).reversed()
                 val newResult = listOf(forward, backward).filter(constraints.evaluate::invoke)
@@ -75,7 +78,9 @@ class MarkovChain<T>(
             }
             else -> {
                 val transitionMap = if (isBackwards) transition.backward else transition.forward
-                val prefix = constraints.endsWith?.reversed() ?: constraints.startsWith ?: emptyList()
+                val prefix = constraints.endsWith?.randomElement(random)?.reversed()
+                    ?: constraints.startsWith?.randomElement(random)
+                    ?: emptyList()
                 val newResult = generateWord(prefix, transitionMap).let {
                     if (isBackwards) it.reversed() else it
                 }.let(::listOf).filter(constraints.evaluate::invoke)

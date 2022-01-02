@@ -13,9 +13,9 @@ data class MarkovChainRequestDto(
 data class ConstraintsDto(
     val minLength: Int? = null,
     val maxLength: Int? = null,
-    val startsWith: String? = null,
+    val startsWith: Collection<String>? = null,
     val notStartsWith: Collection<String>? = null,
-    val endsWith: String? = null,
+    val endsWith: Collection<String>? = null,
     val notEndsWith: Collection<String>? = null,
     val contains: Collection<String>? = null,
     val notContains: Collection<String>? = null,
@@ -33,5 +33,6 @@ fun MarkovChainRequestDto.toConstraints() = Constraints.forWords(
     constraints.contains,
     constraints.notContains,
     constraints.excluding ?: words,
+    null,
     constraints.hybridPrefixPostfix
 )

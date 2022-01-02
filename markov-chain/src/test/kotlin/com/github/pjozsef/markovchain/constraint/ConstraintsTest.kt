@@ -8,13 +8,12 @@ import io.kotlintest.shouldNotThrow
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.FreeSpec
 import io.kotlintest.tables.row
-import java.lang.IllegalArgumentException
 
 class ConstraintsTest : FreeSpec({
 
     "parameter validation" - {
 
-        "minLenght is negative" {
+        "minLength is negative" {
             shouldThrow<IllegalArgumentException> {
                 Constraints<Any>(minLength = -5)
             }
@@ -26,7 +25,7 @@ class ConstraintsTest : FreeSpec({
             }
         }
 
-        "maxLenght is negative" {
+        "maxLength is negative" {
             shouldThrow<IllegalArgumentException> {
                 Constraints<Any>(maxLength = -5)
             }
@@ -38,45 +37,45 @@ class ConstraintsTest : FreeSpec({
             }
         }
 
-        "maxLenth less than minLength" {
+        "maxLength less than minLength" {
             shouldThrow<IllegalArgumentException> {
                 Constraints<Any>(minLength = 4, maxLength = 3)
             }
         }
 
-        "maxLenth less than startsWith length" {
+        "maxLength less than startsWith length" {
             shouldThrow<IllegalArgumentException> {
                 Constraints(
-                    startsWith = "toolong".l,
+                    startsWith = listOf("toolong".l),
                     maxLength = 3
                 )
             }
         }
 
-        "maxLenth less than endsWith length" {
+        "maxLength less than endsWith length" {
             shouldThrow<IllegalArgumentException> {
                 Constraints(
-                    endsWith = "toolong".l,
+                    endsWith = listOf("toolong".l),
                     maxLength = 3
                 )
             }
         }
 
-        "maxLenth equals minimal possible word with startsWith+endsWith" {
+        "maxLength equals minimal possible word with startsWith+endsWith" {
             shouldNotThrow<IllegalArgumentException> {
                 Constraints(
-                    startsWith = "asdf".l,
-                    endsWith = "sdfk".l,
+                    startsWith = listOf("asdf".l),
+                    endsWith = listOf("sdfk".l),
                     maxLength = 5
                 )
             }
         }
 
-        "maxLenth less than minimal possible word with startsWith+endsWith" {
+        "maxLength less than minimal possible word with startsWith+endsWith" {
             shouldThrow<IllegalArgumentException> {
                 Constraints(
-                    startsWith = "asdf".l,
-                    endsWith = "sdfk".l,
+                    startsWith = listOf("asdf".l),
+                    endsWith = listOf("sdfk".l),
                     maxLength = 4
                 )
             }
@@ -84,50 +83,88 @@ class ConstraintsTest : FreeSpec({
 
         "startsWith and notStartsWith has common prefixes" {
             forall(
-                row("asdf".l),
-                row("asd".l),
-                row("as".l),
-                row("a".l)
+                row(listOf("asdf".l)),
+                row(listOf("asd".l)),
+                row(listOf("as".l)),
+                row(listOf("a".l)),
+                row(listOf("as".l, "a".l))
             ) {
                 shouldThrow<IllegalArgumentException> {
                     Constraints(
-                        startsWith = "asdf".l,
-                        notStartsWith = listOf(it)
+                        startsWith = listOf("asdf".l),
+                        notStartsWith = it
                     )
                 }
+            }
+        }
+
+        "startsWith and notStartsWith has common prefixes list" {
+            shouldThrow<Exception> {
+                Constraints(
+                    startsWith = listOf("asdf".l, "e".l),
+                    notStartsWith = listOf("a".l, "asdf".l, "e".l)
+                )
+            }
+        }
+
+        "startsWith and notStartsWith does not fail if there is at least one valid combination" {
+            shouldNotThrow<Exception> {
+                Constraints(
+                    startsWith = listOf("asdf".l, "e".l),
+                    notStartsWith = listOf("asdf".l)
+                )
             }
         }
 
         "notStartsWith can be longer than startsWith" {
             shouldNotThrow<IllegalArgumentException> {
                 Constraints(
-                    startsWith = "asdf".l,
-                    notStartsWith = listOf("asdfj".l)
+                    startsWith = listOf("asdf".l),
+                    notStartsWith = listOf("asdfj".l, "asdfk".l)
                 )
             }
         }
 
         "endsWith and notEndsWith has common prefixes" {
             forall(
-                row("asdf".l),
-                row("sdf".l),
-                row("df".l),
-                row("f".l)
+                row(listOf("asdf".l)),
+                row(listOf("sdf".l)),
+                row(listOf("df".l)),
+                row(listOf("f".l)),
+                row(listOf("df".l, "f".l))
             ) {
                 shouldThrow<IllegalArgumentException> {
                     Constraints(
-                        endsWith = "asdf".l,
-                        notEndsWith = listOf(it)
+                        endsWith = listOf("asdf".l),
+                        notEndsWith = it
                     )
                 }
+            }
+        }
+
+        "endsWith and notEndsWith has common prefixes list" {
+            shouldThrow<Exception> {
+                Constraints(
+                    endsWith = listOf("asdf".l, "e".l),
+                    notEndsWith = listOf("f".l, "asdf".l, "e".l)
+                )
+            }
+        }
+
+        "endsWith and notEndsWith does not fail if there is at least one valid combination" {
+            shouldNotThrow<Exception> {
+                Constraints(
+                    endsWith = listOf("asdf".l, "e".l),
+                    notEndsWith = listOf("asdf".l)
+                )
             }
         }
 
         "notEndsWith can be longer than endsWith" {
             shouldNotThrow<IllegalArgumentException> {
                 Constraints(
-                    endsWith = "asdf".l,
-                    notEndsWith = listOf("aasdf".l)
+                    endsWith = listOf("asdf".l),
+                    notEndsWith = listOf("aasdf".l, "basdf".l)
                 )
             }
         }
@@ -150,9 +187,15 @@ class ConstraintsTest : FreeSpec({
             )
         }
         "startsWith" {
-            Constraints(startsWith = "asdf".l) testWith mapOf(
+            Constraints(startsWith = listOf("asdf".l)) testWith mapOf(
                 false to listOf("asd".l, "_".l, "jkl".l, "-asdf".l),
                 true to listOf("asdf".l, "asdfasdf".l, "asdfjkl".l)
+            )
+        }
+        "startsWith list" {
+            Constraints(startsWith = listOf("www".l, "asdf".l)) testWith mapOf(
+                false to listOf("wa".l, "ww".l, "asd".l, "_".l, "jkl".l, "-asdf".l),
+                true to listOf("www".l, "asdf".l, "asdfasdf".l, "asdfjkl".l)
             )
         }
         "notStartsWith" {
@@ -168,9 +211,15 @@ class ConstraintsTest : FreeSpec({
             )
         }
         "endsWith" {
-            Constraints(endsWith = "asdf".l) testWith mapOf(
+            Constraints(endsWith = listOf("asdf".l)) testWith mapOf(
                 false to listOf("".l, "_".l, "_____sdf".l, "asdf-".l),
                 true to listOf("asdf".l, "asdfasdf".l, "jklasdf".l)
+            )
+        }
+        "endsWith List" {
+            Constraints(endsWith = listOf("www".l, "asdf".l)) testWith mapOf(
+                false to listOf("-ww".l, "-w".l, "".l, "_".l, "_____sdf".l, "asdf-".l),
+                true to listOf("www".l, "-www".l, "asdf".l, "asdfasdf".l, "jklasdf".l)
             )
         }
         "notEndsWith" {
@@ -267,9 +316,9 @@ class ConstraintsTest : FreeSpec({
             Constraints.forWords(
                 minLength = 5,
                 maxLength = 10,
-                startsWith = "asd",
+                startsWith = listOf("asd", "sos"),
                 notStartsWith = listOf("1", ".bc", "xy"),
-                endsWith = "wqw",
+                endsWith = listOf("wqw", "oiu"),
                 notEndsWith = listOf("555", "6"),
                 contains = listOf("x", "yolo"),
                 notContains = listOf("ck", "bm"),
@@ -278,13 +327,13 @@ class ConstraintsTest : FreeSpec({
             ) shouldBe Constraints(
                 minLength = 5,
                 maxLength = 10,
-                startsWith = listOf('a', 's', 'd'),
+                startsWith = listOf(listOf('a', 's', 'd'), listOf('s', 'o', 's')),
                 notStartsWith = listOf(
                     listOf('1'),
                     listOf('.', 'b', 'c'),
                     listOf('x', 'y')
                 ),
-                endsWith = listOf('w', 'q', 'w'),
+                endsWith = listOf(listOf('w', 'q', 'w'), listOf('o', 'i', 'u')),
                 notEndsWith = listOf(
                     listOf('5', '5', '5'),
                     listOf('6')

@@ -9,9 +9,9 @@ import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
 data class Constraints<T>(
     val minLength: Int? = null,
     val maxLength: Int? = null,
-    val startsWith: List<T>? = null,
+    val startsWith: Collection<List<T>>? = null,
     val notStartsWith: Collection<List<T>>? = null,
-    val endsWith: List<T>? = null,
+    val endsWith: Collection<List<T>>? = null,
     val notEndsWith: Collection<List<T>>? = null,
     val contains: Collection<List<T>>? = null,
     val notContains: Collection<List<T>>? = null,
@@ -24,9 +24,9 @@ data class Constraints<T>(
         fun forWords(
             minLength: Int? = null,
             maxLength: Int? = null,
-            startsWith: String? = null,
+            startsWith: Collection<String>? = null,
             notStartsWith: Collection<String>? = null,
-            endsWith: String? = null,
+            endsWith: Collection<String>? = null,
             notEndsWith: Collection<String>? = null,
             contains: Collection<String>? = null,
             notContains: Collection<String>? = null,
@@ -60,12 +60,12 @@ data class Constraints<T>(
         }
         if (maxLength != null) {
             require(maxLength > 0)
-            require(maxLength >= startsWith?.size ?: 0)
-            require(maxLength >= endsWith?.size ?: 0)
+            require(maxLength >= startsWith.innerMaxSize())
+            require(maxLength >= endsWith.innerMaxSize())
             if (startsWith != null && endsWith != null) {
-                val commonLength = WordUtils.commonPostfixPrefixLength(startsWith, endsWith)
-                val startLength = startsWith.size - commonLength
-                val endLength = endsWith.size - commonLength
+                val commonLength = WordUtils.commonPostfixPrefixMultiLength(startsWith, endsWith)
+                val startLength = startsWith.innerMaxSize() - commonLength
+                val endLength = endsWith.innerMaxSize() - commonLength
                 val totalMinimumLength = startLength + commonLength + endLength
                 require(maxLength >= totalMinimumLength)
             }
@@ -74,10 +74,10 @@ data class Constraints<T>(
             }
         }
         if (startsWith != null && notStartsWith != null) {
-            require(notStartsWith.none { startsWith.startsWith(it) })
+            require(startsWith.any { start -> notStartsWith.none { start.startsWith(it) }})
         }
         if (endsWith != null && notEndsWith != null) {
-            require(notEndsWith.none { endsWith.endsWith(it) })
+            require(endsWith.any { end -> notEndsWith.none { end.endsWith(it) }})
         }
     }
 
@@ -85,9 +85,9 @@ data class Constraints<T>(
         listOfNotNull(
             minLength?.let { { input: List<T> -> it <= input.size } },
             maxLength?.let { { input: List<T> -> input.size <= it } },
-            startsWith?.let { { input: List<T> -> input.startsWith(it) } },
+            startsWith?.let { { input: List<T> -> it.any { input.startsWith(it) } } },
             notStartsWith?.let { { input: List<T> -> it.none { input.startsWith(it) } } },
-            endsWith?.let { { input: List<T> -> input.endsWith(it) } },
+            endsWith?.let { { input: List<T> -> it.any{ input.endsWith(it) } } },
             notEndsWith?.let { { input: List<T> -> it.none { input.endsWith(it) } } },
             contains?.let { { input: List<T> -> it.all { input.containsList(it) } } },
             notContains?.let { { input: List<T> -> it.none { input.containsList(it) } } },
@@ -97,3 +97,6 @@ data class Constraints<T>(
             { input -> predicates.all { it(input) } }
         }
 }
+
+private fun <T> Collection<List<T>>?.innerMaxSize() =
+    this?.map { it.size }?.max() ?: 0

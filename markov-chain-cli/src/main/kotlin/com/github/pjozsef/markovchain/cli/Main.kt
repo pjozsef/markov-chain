@@ -30,9 +30,9 @@ class MainCommand : CliktCommand() {
 
     val minLength: Int by option("--min").int().default(3)
     val maxLength: Int by option("--max").int().default(8)
-    val startsWith: String? by option("--starts")
+    val startsWith: Collection<String>? by option("--starts").split(",")
     val notStartsWith: Collection<String>? by option("--not-starts").split(",")
-    val endsWith: String? by option("--ends")
+    val endsWith: Collection<String>? by option("--ends").split(",")
     val notEndsWith: Collection<String>? by option("--not-ends").split(",")
     val contains: Collection<String>? by option("--contains").split(",")
     val notContains: Collection<String>? by option("--not-contains").split(",")
@@ -64,6 +64,7 @@ class MainCommand : CliktCommand() {
         contains,
         notContains,
         excluding ?: actualWords,
+        null,
         hybridPrefixPostfix
     )
 

@@ -17,6 +17,13 @@ object WordUtils {
             start.subList(0, firstEnd) + end.subList(secondStart, end.size)
         }.toSet()
 
+    fun <T> commonPostfixPrefixMultiLength(prefix: Collection<List<T>>, postfix: Collection<List<T>>): Int =
+        prefix.flatMap { pre ->
+            postfix.map { post ->
+                commonPostfixPrefixLength(pre, post)
+            }
+        }.min() ?: 0
+
     fun <T> commonPostfixPrefixLength(prefix: List<T>, postfix: List<T>): Int =
         (1..prefix.size).map {
             prefix.takeLast(it)

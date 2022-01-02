@@ -121,5 +121,17 @@ fun intWeightedDice(probabilities: List<Number>, random: Random = Random()) =
 private fun <T> List<Pair<T, Number>>.normalize(): List<Pair<T, Double>> {
     val listAsDoubles = this.map { (value, probability) -> value to probability.toDouble() }
     val sum = listAsDoubles.sumByDouble { it.second }
-    return listAsDoubles.map {  (value, probability) -> value to probability/sum }
+    return listAsDoubles.map { (value, probability) -> value to probability / sum }
+}
+
+fun <T> Collection<T>.randomElement(random: Random): T {
+    require(this.isNotEmpty()) { "List must not be empty!" }
+    return when (this) {
+        is List -> this[random.nextInt(this.size)]
+        else -> {
+            val i = random.nextInt(this.size)
+            val drop = kotlin.math.max(i - 1, 0)
+            this.drop(drop).first()
+        }
+    }
 }

@@ -26,7 +26,8 @@ fun <T> generateWords(
             commentFilter = commentFilter
         ).asDice(random),
         end = delimiter,
-        allowedRetries = allowedRetries
+        allowedRetries = allowedRetries,
+        random = random
     )
     return chain.generate(
         order = order,

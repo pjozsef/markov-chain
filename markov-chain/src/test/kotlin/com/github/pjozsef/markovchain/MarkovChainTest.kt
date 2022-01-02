@@ -9,17 +9,19 @@ import io.kotlintest.IsolationMode
 import io.kotlintest.matchers.numerics.shouldBeGreaterThanOrEqual
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.FreeSpec
+import java.util.*
 
 class MarkovChainTest : FreeSpec({
 
     "Markov chain" - {
+        val random = Random()
 
         "generates char sequence" {
             mapOf(
                 "" to listOf("A"),
                 "A" to listOf("B", "A", "B"),
                 "B" to listOf("A", "B", "#")
-            ).l shouldGenerate "ABAABB".l
+            ).l with random shouldGenerate "ABAABB".l
         }
 
         "generates char sequence with multi character delimiter" {
@@ -28,7 +30,7 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("B", "A", "B"),
                 "B" to listOf("A", "B", "#"),
                 "#" to listOf("#")
-            ).l withOrder 2 withDelimiter listOf("#", "#") shouldGenerate "ABAABB".l
+            ).l withOrder 2 withDelimiter listOf("#", "#") with random shouldGenerate "ABAABB".l
         }
 
         "supports higher order transition" {
@@ -37,7 +39,7 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("A"),
                 "AAAA" to listOf("BB"),
                 "BB" to listOf("#")
-            ).l shouldGenerate "AAAABB".l
+            ).l with random shouldGenerate "AAAABB".l
         }
 
         "uses set order as maximum order" {
@@ -48,7 +50,7 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("#"),
                 "AABB" to listOf("C"),
                 "C" to listOf("#")
-            ).l withOrder 2 shouldGenerate "AABB".l
+            ).l withOrder 2 with random shouldGenerate "AABB".l
         }
 
         "starts generation with prefix if supplied" {
@@ -57,21 +59,21 @@ class MarkovChainTest : FreeSpec({
                 "A" to listOf("#"),
                 "f" to listOf("C"),
                 "C" to listOf("#")
-            ).l withConstraints Constraints(startsWith = "asdf".l) shouldGenerate "asdfC".l
+            ).l with Constraints(startsWith = listOf("asdf".l)) with random shouldGenerate "asdfC".l
         }
 
         "uses constraints to verify generated text" {
             mapOf(
                 "" to listOf("AAAAAAA", "A"),
                 "A" to listOf("#")
-            ).l withConstraints Constraints(maxLength = 1) shouldGenerate "A".l
+            ).l with Constraints(maxLength = 1) with random shouldGenerate "A".l
         }
 
         "returns intermediate result once retry count reached" {
             mapOf(
                 "" to listOf("A", "#"),
                 "A" to listOf("#")
-            ).l.markov().generate(
+            ).l.with(random).markov().generate(
                 1, 3, constraints = Constraints(
                     minLength = 1
                 )
@@ -86,8 +88,8 @@ class MarkovChainTest : FreeSpec({
                 "B" to listOf("B"),
                 "BB" to listOf("C"),
                 "BBC" to listOf("#")
-            ).l withOrder 3 withConstraints Constraints(
-                endsWith = "ASD".l
+            ).l withOrder 3 with random with Constraints(
+                endsWith = listOf("ASD".l)
             ) shouldGenerate "CBBASD".l
         }
 
@@ -103,10 +105,10 @@ class MarkovChainTest : FreeSpec({
                 "o" to listOf("l", "c"),
                 "l" to listOf("o"),
                 "c" to listOf("#")
-            ).l withOrder 3 withConstraints Constraints(
+            ).l withOrder 3 with random with Constraints(
                 hybridPrefixPostfix = true,
-                startsWith = "fol".l,
-                endsWith = "ed".l
+                startsWith = listOf("fol".l),
+                endsWith = listOf("ed".l)
             ) shouldGenerate listOf(
                 "folored".l,
                 "folded".l,
@@ -125,10 +127,10 @@ class MarkovChainTest : FreeSpec({
                 "l" to listOf("l", "o"),
                 "o" to listOf("l", "f"),
                 "f" to listOf("#")
-            ).l withOrder 3 withConstraints Constraints(
+            ).l withOrder 3 with random with Constraints(
                 hybridPrefixPostfix = false,
-                startsWith = "fol".l,
-                endsWith = "ed".l
+                startsWith = listOf("fol".l),
+                endsWith = listOf("ed".l)
             )
             params.markov().generate(
                 order = 3,
@@ -152,7 +154,15 @@ class MarkovChainTest : FreeSpec({
             val count = 10
 
             val markovChain =
-                MarkovChain(TransitionRule.fromWords(words, delimiter = listOf("#"), commentFilter = stringCommentFilter()).asDice(), end = "#".l)
+                MarkovChain(
+                    TransitionRule.fromWords(
+                        words,
+                        delimiter = listOf("#"),
+                        commentFilter = stringCommentFilter()
+                    ).asDice(),
+                    end = "#".l,
+                    random = random
+                )
 
             "returned result size is as specified" {
                 markovChain
@@ -164,8 +174,8 @@ class MarkovChainTest : FreeSpec({
                 markovChain
                     .generate(
                         1, count, constraints = Constraints(
-                            startsWith = "q".l,
-                            endsWith = "x".l
+                            startsWith = listOf("q".l),
+                            endsWith = listOf("x".l)
                         )
                     )
                     .size shouldBeGreaterThanOrEqual count
@@ -182,7 +192,7 @@ class MarkovChainTest : FreeSpec({
                     listOf(2, 2) to listOf(listOf(3)),
                     listOf(3) to listOf(listOf(0)),
                     listOf(0) to listOf(listOf(0))
-                ) withOrder 2 withDelimiter listOf(0) shouldGenerate listOf(
+                ) withOrder 2 withDelimiter listOf(0) with random shouldGenerate listOf(
                     listOf(1, 2, 2, 3)
                 )
             }
@@ -197,10 +207,14 @@ private data class TestParameters<T>(
     val mockForwardTransitions: Map<List<T>, List<List<T>>>,
     val mockBackwardTransitions: Map<List<T>, List<List<T>>> = emptyMap(),
     val order: Int = Int.MAX_VALUE,
+    private val _random: Random? = null,
     val constraints: Constraints<T> = Constraints(),
     val retryCount: Int = 2,
     val delimiter: List<T>? = null
-)
+) {
+    val random: Random
+    get() = _random ?: error("Random was not set in Test Parameters!")
+}
 
 private infix fun <T> Map<List<T>, List<List<T>>>.withOrder(order: Int): TestParameters<T> =
     TestParameters(this, order = order)
@@ -208,10 +222,16 @@ private infix fun <T> Map<List<T>, List<List<T>>>.withOrder(order: Int): TestPar
 private infix fun <T> TestParameters<T>.withOrder(order: Int): TestParameters<T> =
     this.copy(order = order)
 
-private infix fun <T> Map<List<T>, List<List<T>>>.withConstraints(constraints: Constraints<T>): TestParameters<T> =
+private infix fun <T> TestParameters<T>.with(random: Random): TestParameters<T> =
+    this.copy(_random = random)
+
+private infix fun <T> Map<List<T>, List<List<T>>>.with(random: Random) =
+    TestParameters(this, _random = random)
+
+private infix fun <T> Map<List<T>, List<List<T>>>.with(constraints: Constraints<T>): TestParameters<T> =
     TestParameters<T>(this, constraints = constraints)
 
-private infix fun <T> TestParameters<T>.withConstraints(constraints: Constraints<T>): TestParameters<T> =
+private infix fun <T> TestParameters<T>.with(constraints: Constraints<T>): TestParameters<T> =
     this.copy(constraints = constraints)
 
 private infix fun <T> TestParameters<T>.withDelimiter(delimiter: List<T>): TestParameters<T> =
@@ -238,6 +258,7 @@ private fun <T> TestParameters<T>.markov() = MarkovChain(
         this.mockBackwardTransitions.generateDice()
     ),
     this.delimiter ?: listOf("#") as List<T>,
+    this.random,
     this.retryCount
 )
 

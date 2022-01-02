@@ -23,7 +23,7 @@ fun parseConstraint(stringConstraints: String): Constraints<Char> =
                 if (it.startsWith("!")) {
                     newConstraints = newConstraints.copy(notStartsWith = newList(it, newConstraints::notStartsWith))
                 } else {
-                    newConstraints = newConstraints.copy(startsWith = it.list)
+                    newConstraints = newConstraints.copy(startsWith = newList(it, newConstraints::startsWith))
                 }
             }
             it.groups["contains"]?.value?.also {
@@ -37,7 +37,7 @@ fun parseConstraint(stringConstraints: String): Constraints<Char> =
                 if (it.startsWith("!")) {
                     newConstraints = newConstraints.copy(notEndsWith = newList(it, newConstraints::notEndsWith))
                 } else {
-                    newConstraints = newConstraints.copy(endsWith = it.list)
+                    newConstraints = newConstraints.copy(endsWith = newList(it, newConstraints::endsWith))
                 }
             }
         }

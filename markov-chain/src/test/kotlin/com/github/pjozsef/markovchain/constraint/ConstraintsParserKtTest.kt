@@ -48,7 +48,7 @@ class ConstraintsParserKtTest : FreeSpec({
             row(
                 "startsWith",
                 "prefix**",
-                Constraints(startsWith = "prefix".c)
+                Constraints(startsWith = listOf("prefix".c))
             ),
             row(
                 "notStartsWith",
@@ -60,7 +60,11 @@ class ConstraintsParserKtTest : FreeSpec({
                 "!prefix**, !p2**, !a**",
                 Constraints(notStartsWith = listOf("prefix".c, "p2".c, "a".c))
             ),
-            row("endsWith", "**suffix", Constraints(endsWith = "suffix".c)),
+            row(
+                "endsWith",
+                "**suffix",
+                Constraints(endsWith = listOf("suffix".c))
+            ),
             row(
                 "notEndsWith",
                 "**!suffix",
@@ -94,7 +98,7 @@ class ConstraintsParserKtTest : FreeSpec({
             row(
                 "startsWith, contains, endsWith together",
                 "a*b*c",
-                Constraints(startsWith = "a".c, contains = listOf("b".c), endsWith = "c".c)
+                Constraints(startsWith = listOf("a".c), contains = listOf("b".c), endsWith = listOf("c".c))
             ),
             row(
                 "notStartsWith, notContains, notEndsWith together",
@@ -124,7 +128,7 @@ class ConstraintsParserKtTest : FreeSpec({
             row(
                 "ignores extra separators",
                 ",,, , 5-8, , a**b",
-                Constraints(minLength = 5, maxLength = 8, startsWith = "a".c, endsWith = "b".c)
+                Constraints(minLength = 5, maxLength = 8, startsWith = listOf("a".c), endsWith = listOf("b".c))
             )
         ) { test, input, expected ->
             test {
