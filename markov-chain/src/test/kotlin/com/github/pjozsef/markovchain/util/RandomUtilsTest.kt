@@ -2,14 +2,13 @@ package com.github.pjozsef.markovchain.util
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import io.kotlintest.IsolationMode
-import io.kotlintest.data.forall
-import io.kotlintest.matchers.doubles.plusOrMinus
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.FreeSpec
-import io.kotlintest.tables.row
-import java.lang.IllegalArgumentException
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import java.util.*
 
 class RandomUtilsTest: FreeSpec({
@@ -49,7 +48,7 @@ class RandomUtilsTest: FreeSpec({
             coin1 shouldBe coin2
         }
         "statistics should reflect trueProbability" - {
-            forall(
+            forAll(
                 row(0.5),
                 row(0.2),
                 row(0.1),
@@ -126,7 +125,7 @@ class RandomUtilsTest: FreeSpec({
             die1 shouldBe die2
         }
         "statistics should reflect probabilities" {
-            forall(
+            forAll(
                 row(listOf(0.5, 0.3, 0.2)),
                 row(listOf(0.8, 0.1, 0.1)),
                 row(listOf(0.0, 0.6, 0.4)),

@@ -2,13 +2,16 @@ package com.github.pjozsef.markovchain
 
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.testutil.l
-import com.github.pjozsef.markovchain.util.*
+import com.github.pjozsef.markovchain.util.TransitionRule
+import com.github.pjozsef.markovchain.util.WeightedDice
+import com.github.pjozsef.markovchain.util.asDice
+import com.github.pjozsef.markovchain.util.stringCommentFilter
 import com.nhaarman.mockitokotlin2.doReturnConsecutively
 import com.nhaarman.mockitokotlin2.mock
-import io.kotlintest.IsolationMode
-import io.kotlintest.matchers.numerics.shouldBeGreaterThanOrEqual
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.ints.shouldBeGreaterThanOrEqual
+import io.kotest.matchers.shouldBe
 import java.util.*
 
 class MarkovChainTest : FreeSpec({

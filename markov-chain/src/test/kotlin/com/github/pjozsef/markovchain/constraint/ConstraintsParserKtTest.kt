@@ -1,15 +1,15 @@
 package com.github.pjozsef.markovchain.constraint
 
 import com.github.pjozsef.markovchain.testutil.c
-import io.kotlintest.IsolationMode
-import io.kotlintest.data.suspend.forall
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
-import io.kotlintest.tables.row
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
+import io.kotest.matchers.shouldBe
 
 class ConstraintsParserKtTest : FreeSpec({
     "parse" - {
-        forall(
+        forAll(
             row(
                 "min length",
                 "2-",

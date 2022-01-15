@@ -11,7 +11,7 @@ dependencies {
     implementation "com.github.ajalt:clikt:2.2.0"
     implementation project(":markov-chain")
 
-    runtime "org.slf4j:slf4j-jdk14:1.8.0-beta4"
+    runtimeOnly "org.slf4j:slf4j-jdk14:1.8.0-beta4"
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.3.2"

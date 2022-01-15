@@ -1,11 +1,11 @@
 package com.github.pjozsef.markovchain.util
 
 import com.github.pjozsef.markovchain.testutil.l
-import io.kotlintest.IsolationMode
-import io.kotlintest.data.suspend.forall
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
-import io.kotlintest.tables.row
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
+import io.kotest.matchers.shouldBe
 
 
 class TransitionRuleUtilsTest : FreeSpec({
@@ -21,7 +21,7 @@ class TransitionRuleUtilsTest : FreeSpec({
             "quuz".l
         )
 
-        forall(
+        forAll(
             row(
                 1, mapOf(
                     "" to mapOf("f" to 1, "b" to 2, "q" to 3),

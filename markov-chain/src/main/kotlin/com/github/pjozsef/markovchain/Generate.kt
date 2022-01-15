@@ -39,6 +39,6 @@ fun <T> generateWords(
 
 private fun initializeRandom(seed: Long?): Random {
     val randomSeed = seed ?: System.currentTimeMillis().toString(RADIX_36).takeLast(3).toLong(RADIX_36)
-    println("Seed: ${randomSeed.toString(RADIX_36).toUpperCase()}")
+    println("Seed: ${randomSeed.toString(RADIX_36).uppercase()}")
     return Random(randomSeed)
 }

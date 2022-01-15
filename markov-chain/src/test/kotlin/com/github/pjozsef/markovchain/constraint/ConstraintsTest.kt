@@ -1,13 +1,13 @@
 package com.github.pjozsef.markovchain.constraint
 
 import com.github.pjozsef.markovchain.testutil.l
-import io.kotlintest.IsolationMode
-import io.kotlintest.data.forall
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotThrow
-import io.kotlintest.shouldThrow
-import io.kotlintest.specs.FreeSpec
-import io.kotlintest.tables.row
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
+import io.kotest.matchers.shouldBe
 
 class ConstraintsTest : FreeSpec({
 
@@ -82,7 +82,7 @@ class ConstraintsTest : FreeSpec({
         }
 
         "startsWith and notStartsWith has common prefixes" {
-            forall(
+            forAll(
                 row(listOf("asdf".l)),
                 row(listOf("asd".l)),
                 row(listOf("as".l)),
@@ -126,7 +126,7 @@ class ConstraintsTest : FreeSpec({
         }
 
         "endsWith and notEndsWith has common prefixes" {
-            forall(
+            forAll(
                 row(listOf("asdf".l)),
                 row(listOf("sdf".l)),
                 row(listOf("df".l)),

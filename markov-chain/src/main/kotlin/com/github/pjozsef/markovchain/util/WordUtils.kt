@@ -22,7 +22,7 @@ object WordUtils {
             postfix.map { post ->
                 commonPostfixPrefixLength(pre, post)
             }
-        }.min() ?: 0
+        }.minOrNull() ?: 0
 
     fun <T> commonPostfixPrefixLength(prefix: List<T>, postfix: List<T>): Int =
         (1..prefix.size).map {

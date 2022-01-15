@@ -120,7 +120,7 @@ fun intWeightedDice(probabilities: List<Number>, random: Random = Random()) =
 
 private fun <T> List<Pair<T, Number>>.normalize(): List<Pair<T, Double>> {
     val listAsDoubles = this.map { (value, probability) -> value to probability.toDouble() }
-    val sum = listAsDoubles.sumByDouble { it.second }
+    val sum = listAsDoubles.sumOf { it.second }
     return listAsDoubles.map { (value, probability) -> value to probability / sum }
 }
 

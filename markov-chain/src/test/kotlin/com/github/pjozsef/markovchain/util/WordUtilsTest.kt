@@ -4,16 +4,16 @@ import com.github.pjozsef.markovchain.testutil.l
 import com.github.pjozsef.markovchain.util.WordUtils.containsList
 import com.github.pjozsef.markovchain.util.WordUtils.endsWith
 import com.github.pjozsef.markovchain.util.WordUtils.startsWith
-import io.kotlintest.IsolationMode
-import io.kotlintest.data.suspend.forall
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
-import io.kotlintest.tables.row
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
+import io.kotest.matchers.shouldBe
 
 
 class WordUtilsTest : FreeSpec({
     "combine single words" - {
-        forall(
+        forAll(
             row(
                 "returns all combinations of words at matching letters",
                 "red".l,
@@ -117,7 +117,7 @@ class WordUtilsTest : FreeSpec({
     }
 
     "startsWith" {
-        forall(
+        forAll(
             row(listOf(), listOf(), true),
             row(listOf("a", "b"), listOf("c"), false),
             row(listOf("a"), listOf("a"), true),
@@ -129,7 +129,7 @@ class WordUtilsTest : FreeSpec({
     }
 
     "endsWith" {
-        forall(
+        forAll(
             row(listOf(), listOf(), true),
             row(listOf("a", "b"), listOf("c"), false),
             row(listOf("a"), listOf("a"), true),
@@ -142,7 +142,7 @@ class WordUtilsTest : FreeSpec({
     }
 
     "containsList" {
-        forall(
+        forAll(
             row(listOf(), listOf(), true),
             row(listOf("a", "b"), listOf("c"), false),
             row(listOf("a"), listOf("a"), true),

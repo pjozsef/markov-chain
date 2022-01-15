@@ -3,9 +3,9 @@ package com.github.pjozsef.markovchain
 import com.github.pjozsef.markovchain.constraint.Constraints
 import com.github.pjozsef.markovchain.util.WordUtils.toListOfChar
 import com.github.pjozsef.markovchain.util.charCommentFilter
-import io.kotlintest.IsolationMode
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.FreeSpec
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.shouldBe
 import java.io.InputStreamReader
 
 class GenerateKtTest: FreeSpec({

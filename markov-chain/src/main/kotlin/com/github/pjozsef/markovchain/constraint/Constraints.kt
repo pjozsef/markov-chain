@@ -99,4 +99,4 @@ data class Constraints<T>(
 }
 
 private fun <T> Collection<List<T>>?.innerMaxSize() =
-    this?.map { it.size }?.max() ?: 0
+    this?.map { it.size }?.maxOrNull() ?: 0
